@@ -16,26 +16,27 @@ const link2 = 419.1;
 const link3 = 168.37;
 const link4 = 619.71;
 
-var scale = 1;
+const scale = 1;
 
-var material = new THREE.MeshNormalMaterial();
+const material = new THREE.MeshNormalMaterial();
 
 let topArm = new THREE.Mesh();
 let botArm = new THREE.Mesh();
 let knuckle = new THREE.Mesh();
 let frame = new THREE.Mesh();
 
-var group = new THREE.Group();
-var mainGroup = new THREE.Group();
+const group = new THREE.Group();
+const mainGroup = new THREE.Group();
 
-var loader = new THREE.STLLoader();
+let loader = new THREE.STLLoader();
+
 loader.load( '/stl/topArm.stl', function ( geometry ) {
     topArm.geometry = geometry;
     topArm.material = material;
     topArm.scale.set(scale,scale,scale);
 });
 
-var loader = new THREE.STLLoader();
+
 loader.load( '/stl/bottomArm.stl', function ( geometry ) {
     botArm.geometry = geometry;
     botArm.material = material;
@@ -72,7 +73,7 @@ scene.add(mainGroup);
 camera.position.z = 600;
 controls.update();
 
-var i = 0;
+let i = 0;
 function animate() {
     requestAnimationFrame( animate );
     i += 0.04;
