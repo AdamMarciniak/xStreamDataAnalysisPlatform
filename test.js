@@ -1,10 +1,30 @@
+
+
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth
     / window.innerHeight, 0.1, 7000);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
+const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('canvas'), antialias: true});
+
+function resizeCanvasToDisplaySize() {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    if (canvas.width !== width || canvas.height !== height) {
+        // you must pass false here or three.js sadly fights the browser
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+
+        // set render target sizes here
+    }
+}
+
+
 document.body.appendChild(renderer.domElement);
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+scene.background = new THREE.Color(0xE5E5E5);
 
 const four = new VectorFourBar;
 let outputRight;
@@ -31,7 +51,11 @@ for (i = 0; i < 20000; i++) {
 
 const scale = 1;
 
-const material = new THREE.MeshNormalMaterial();
+const material = new THREE.MeshPhongMaterial({ color: 0x606060 });
+
+var light = new THREE.DirectionalLight(0xffffff);
+light.position.set(0, 1, 1).normalize();
+scene.add(light);
 
 const masterGroup = new THREE.Group();
 const suspensionGroupLeft = new THREE.Group();
@@ -81,10 +105,10 @@ loader.load('/stl/BottomArm.stl', function (geometry) {
 loader.load('/stl/wheel.stl', function (geometry) {
     wheelLeft.geometry = geometry;
     wheelLeft.material = material;
-    wheelLeft.scale.set(6, 6, 6);
+    wheelLeft.scale.set(5.5, 5.5, 4.25);
     wheelRight.geometry = geometry;
     wheelRight.material = material;
-    wheelRight.scale.set(6, 6, 6);
+    wheelRight.scale.set(5.5, 5.5, 4.25);
 
 });
 
@@ -156,15 +180,20 @@ masterGroup.add(suspensionGroupRight);
 masterGroup.add(suspensionGroupLeft);
 
 scene.add(masterGroup);
+masterGroup.position.set(800,0,0);
 
 
 
-camera.position.set(1419, 590, 860);
+camera.position.set(1700, 1000, 1200);
 controls.update();
+
+masterGroup.rotation.z = 0.2;
 
 i = 0;
 let k = 0;
 function animate() {
+
+    resizeCanvasToDisplaySize();
     requestAnimationFrame(animate);
     i += 0.04;
     k++;
@@ -173,10 +202,8 @@ function animate() {
         k = 0;
     };
 
-    masterGroup.rotation.z = 0.04 * Math.sin(i + 0.5);
-    masterGroup.rotation.x = 0.02 * Math.sin(i);
-    masterGroup.rotation.y = 0.03 * Math.sin(i - 0.23);
-    masterGroup.position.y = 50 * Math.sin(i);
+    //masterGroup.rotation.z = 0.04 * Math.sin(i + 0.5);
+    //masterGroup.rotation.y = 0.03 * Math.sin(i - 0.23);
     armTopKnuckleGroupLeft.rotation.x = angleDataLeft[k];
     armTopKnuckleGroupRight.rotation.x = angleDataRight[k];
 
@@ -191,11 +218,16 @@ function animate() {
 
     botArmLeft.rotation.x = outputLeft.open - 3.14159 / 2 - 45 * 3.14159 / 180;
     knuckleWheelGroupLeft.rotation.x = -couplerLeft.open + 50 * 3.14159 / 180 - armTopKnuckleGroupLeft.rotation.x;
-    knuckleWheelGroupLeft.rotation.y = 0.4 * Math.sin(i) + Math.PI / 2;
+    //knuckleWheelGroupLeft.rotation.y = 0.4 * Math.sin(i) + Math.PI / 2;
 
     botArmRight.rotation.x = outputRight.open - 3.14159 / 2 - 45 * 3.14159 / 180;
     knuckleWheelGroupRight.rotation.x = -couplerRight.open + 50 * 3.14159 / 180 - armTopKnuckleGroupRight.rotation.x;
-    knuckleWheelGroupRight.rotation.y = 0.4 * Math.sin(i) + Math.PI / 2;
+    //knuckleWheelGroupRight.rotation.y = 0.4 * Math.sin(i) + Math.PI / 2;
+
+    wheelLeft.rotation.x = -3*i;
+    wheelRight.rotation.x = +3 * i;
+
+
 
     controls.update();
     renderer.render(scene, camera);
