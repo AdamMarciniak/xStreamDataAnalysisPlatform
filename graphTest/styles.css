@@ -1,0 +1,17 @@
+
+html, body {
+	padding: 0,0,0,0;
+	margin: 0;
+}
+
+.stack {
+    position:relative;
+    }
+#graph, #slider {
+    position:absolute;
+    left:0;
+    top:0;
+    }
+	
+
+	
