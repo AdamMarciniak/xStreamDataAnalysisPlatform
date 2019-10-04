@@ -89,15 +89,34 @@ onmousemove = function(e){
 	
 	sliderCtx.beginPath()
 	sliderCtx.arc(e.clientX, scaledData[e.clientX-16][1], 5, 0, 2 * Math.PI);
-	sliderCtx.stroke();
+  sliderCtx.fill();
+  
+  var rect = canvas.getBoundingClientRect(), // abs. size of element
+  scaleX = canvas.width / rect.width,    // relationship bitmap vs. element for X
+  scaleY = canvas.height / rect.height;  // relationship bitmap vs. element for Y
 
+  x = (e.clientX - rect.left) * scaleX;
+  y = (e.clientY- rect.top) * scaleY;
 	
-	sliderCtx.font = "30px Arial";
+  sliderCtx.font = "30px Arial";
+  
+  let yData = scaleToCanvas(data[x][1],yMin,yMax,canvasMinY,canvasMaxY);
 	
 	
-	sliderCtx.fillText("X Val: " + (e.clientX-16) + "\n" +"Y Val: " +  Number(data[e.clientX-11][1]).toFixed(2), e.clientX, 90);
+	sliderCtx.fillText("X Val: " + (x) + "\n" +"Y Val: " +  Number(yData).toFixed(2), e.clientX, 90);
 	
 	}
+}
+
+function  getMousePos(canvas, evt) {
+  var rect = canvas.getBoundingClientRect(), // abs. size of element
+      scaleX = canvas.width / rect.width,    // relationship bitmap vs. element for X
+      scaleY = canvas.height / rect.height;  // relationship bitmap vs. element for Y
+
+  return {
+    x: (evt.clientX - rect.left) * scaleX,   // scale mouse coordinates after they have
+    y: (evt.clientY - rect.top) * scaleY     // been adjusted to be relative to element
+  }
 }
 
 
