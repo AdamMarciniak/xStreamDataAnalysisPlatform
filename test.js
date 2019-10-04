@@ -188,7 +188,6 @@ camera.position.set(1700, 1000, 1200);
 controls.update();
 
 masterGroup.rotation.z = 0.2;
-
 i = 0;
 let k = 0;
 function animate() {
@@ -201,11 +200,11 @@ function animate() {
     if (k == 20000 - 1) {
         k = 0;
     };
-
+    console.log(-data[Math.round(inputSpaceX)][1].toFixed(2));
     //masterGroup.rotation.z = 0.04 * Math.sin(i + 0.5);
     //masterGroup.rotation.y = 0.03 * Math.sin(i - 0.23);
-    armTopKnuckleGroupLeft.rotation.x = angleDataLeft[k];
-    armTopKnuckleGroupRight.rotation.x = angleDataRight[k];
+    armTopKnuckleGroupLeft.rotation.x = -data[Math.round(inputSpaceX)][1].toFixed(2)
+    armTopKnuckleGroupRight.rotation.x = -data[Math.round(inputSpaceX)][1].toFixed(2)
 
 
     angleLeft = ((armTopKnuckleGroupLeft.rotation.x + 3.14159 / 2) + 45 * 3.14159 / 180);

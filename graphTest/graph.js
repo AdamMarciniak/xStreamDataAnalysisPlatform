@@ -2,17 +2,18 @@
 
 const canvas  = document.getElementById('graph');
 const slider  = document.getElementById('slider');
+const stack = document.getElementById('stack');
 
 
 const ctx = canvas.getContext('2d');
 const sliderCtx = slider.getContext('2d');
-
+var inputSpaceX = 20;
 const padding = 15;
 
 const data = [];
 
 for (let i=0; i<1000; i++){
-  data.push([i, 24 - (37.6 * Math.sin(i/100))]);
+  data.push([i, (Math.PI/7* Math.sin(i/50)) + Math.sin(i/5)/20]);
 }
 
 const canvasMaxX = canvas.width - padding;
@@ -26,8 +27,6 @@ function scaleToCanvas(input,inMin,inMax,outMin,outMax){
   output = outMin + zeroToOne*(outMax - outMin);
   return output;
 }
-
-
 
 
 const dataXs = data.map(([x, y]) => x);
@@ -76,36 +75,42 @@ document.body.onmouseup = function() {
 
 console.log(data);
 
+console.log(stack.offsetLeft);
+
 onmousemove = function(e){
-	if (e.clientX < canvasMaxX && e.clientX > canvasMinX && e.clientY < canvasMaxY && e.clientY > canvasMinY && mouseDown==1){
+	if (e.clientX < canvasMaxX + canvas.offsetLeft && e.clientX > canvasMinX + canvas.offsetLeft && e.clientY < canvasMaxY + canvas.offsetTop && e.clientY > canvasMinY + canvas.offsetTop && mouseDown==1){
 		
-	console.log("mouse location:", e.clientX, e.clientY)
+  console.log("mouse location:", e.clientX, e.clientY)
+  
+  const canvasX = e.clientX - canvas.offsetLeft;
+  const canvasY = e.clientY - canvas.offsetTop;
+
 	
 	sliderCtx.clearRect(0, 0, canvas.width, canvas.height);
 	sliderCtx.beginPath()
-	sliderCtx.moveTo(e.clientX,canvasMinY);
-	sliderCtx.lineTo(e.clientX,canvasMaxY);
+	sliderCtx.moveTo(canvasX ,canvasMinY );
+	sliderCtx.lineTo(canvasX ,canvasMaxY );
 	sliderCtx.stroke();
 	
 
   var rect = canvas.getBoundingClientRect(), // abs. size of element
   scaleX = canvas.width / rect.width,    // relationship bitmap vs. element for X
   scaleY = canvas.height / rect.height;  // relationship bitmap vs. element for Y
-  x = (e.clientX - rect.left) * scaleX;
-  y = (e.clientY- rect.top) * scaleY;
+  x = (canvasX - rect.left) * scaleX;
+  y = (canvasY- rect.top) * scaleY;
 	
-  sliderCtx.font = "30px Arial";
+  sliderCtx.font = "20px Arial";
 
-  const inputSpaceX = scaleToCanvas(x,canvasMinX,canvasMaxX,xMin,xMax);
+  inputSpaceX = scaleToCanvas(x,canvasMinX - canvas.offsetLeft,canvasMaxX - canvas.offsetLeft,xMin,xMax);
   
   const outputSpaceY = scaleToCanvas(data[Math.round(inputSpaceX)][1],yMin,yMax,canvasMinY,canvasMaxY);
 
 
   sliderCtx.beginPath()
-	sliderCtx.arc(e.clientX, outputSpaceY, 5, 0, 2 * Math.PI);
+	sliderCtx.arc(canvasX, outputSpaceY, 5, 0, 2 * Math.PI);
   sliderCtx.fill();
 	
-	sliderCtx.fillText("X Val: " + (inputSpaceX.toFixed(0)) + "\n" +"Y Val: " +  Number(-data[Math.round(inputSpaceX)][1]).toFixed(2), e.clientX, 90);
+	sliderCtx.fillText("Time: " + (inputSpaceX.toFixed(0)) + "\n" +"Angle: " +  Number(-data[Math.round(inputSpaceX)][1] * 180/Math.PI).toFixed(2)  + " deg", 20, 35);
 	
 	}
 }

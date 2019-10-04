@@ -1,3 +1,8 @@
+html, body {
+	padding: 0,0,0,0;
+	margin: 0;
+}
+
 .bg
 {
 position:absolute;
@@ -15,7 +20,7 @@ height: 100%;
     position:relative; 
 }
 
-canvas {
+#carModel {
     width: 700px;
     height: 620px;
     left: 0px;
@@ -23,4 +28,18 @@ canvas {
     z-index: 20;
     top: -680px;
 }
+
+
+
+#stack {
+    position:relative;
+    }
+#graph, #slider {
+    position:absolute;
+    left:950;
+    top:245;
+    z-index: 20;
+    }
+	
+
 
