@@ -6,6 +6,9 @@
 
 Data Analytics Platform for BCIT Racing Car. (In Progress)
 
+Check out a live demo here! 
+[http://adam.teaches.engineering](http://adam.teaches.engineering)
+
 Core Features:
  - Scrub through data easily and quickly.
  - Move suspension links in 3D model based on imported real world sensor data.
