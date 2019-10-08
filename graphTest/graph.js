@@ -1,55 +1,126 @@
 
 
-const canvas  = document.getElementById('graph');
-const slider  = document.getElementById('slider');
-const stack = document.getElementById('stack');
+const stackElement = document.getElementById('stack');
+const ulElement = document.createElement("UL");
+stackElement.appendChild(ulElement);
 
 
-const ctx = canvas.getContext('2d');
-const sliderCtx = slider.getContext('2d');
-var inputSpaceX = 20;
+const rawDataTotal = {}
+const nonTimeProperties = ['velocity','acceleration','rightArmAngle','leftArmAngle','rearStress','frontStress']
+
+const timeArray = [];
+let k = 1;
+nonTimeProperties.forEach((property) => {
+  k+=10;
+  let rawData = [];
+  for (let i = 0; i < 1000; i++){
+    rawData.push([(Math.PI/7* Math.sin(i/k)) + Math.sin(i/5)/20]);
+  };
+  rawDataTotal[property] = rawData
+});
+
+
+for (let i = 0; i < 1000; i++){
+  timeArray.push(i);
+};
+
+console.log(rawDataTotal);
+
+
+const canvases = {};
+nonTimeProperties.forEach((property) => {
+  let liElement = document.createElement("LI");
+  const newCanvas = document.createElement("canvas");
+
+
+  newCanvas.setAttribute("id",property);
+  canvases[property] = newCanvas;
+  
+  liElement.appendChild(canvases[property]);
+  ulElement.appendChild(liElement);
+  console.log(liElement.getBoundingClientRect().width);
+  newCanvas.width = liElement.getBoundingClientRect().width;
+  newCanvas.height = liElement.getBoundingClientRect().height;
+});
+
+
+
 const padding = 15;
 
-const data = [];
+const updateCanvases = () =>
 
-for (let i=0; i<1000; i++){
-  data.push([i, (Math.PI/7* Math.sin(i/50)) + Math.sin(i/5)/20]);
-}
+{
 
-const canvasMaxX = canvas.width - padding;
-const canvasMaxY = canvas.height - padding;
-const canvasMinX = padding;
-const canvasMinY = padding;
+  nonTimeProperties.forEach((property) => {
 
-function scaleToCanvas(input,inMin,inMax,outMin,outMax){
-
-  const zeroToOne = (input - inMin) / (inMax - inMin);
-  output = outMin + zeroToOne*(outMax - outMin);
-  return output;
-}
-
-
-const dataXs = data.map(([x, y]) => x);
-const dataYs = data.map(([x, y]) => y);
-
-const xMin = Math.min(...dataXs);
-const xMax = Math.max(...dataXs);
-const yMin = Math.min(...dataYs);
-const yMax = Math.max(...dataYs);
-
-
-const scaledData = data.map(([x, y]) => [
-  scaleToCanvas(x, xMin, xMax, canvasMinX, canvasMaxX),
-  scaleToCanvas(y, yMin, yMax, canvasMinY, canvasMaxY)
-]);
+    const canvas  = canvases[property];
+    const ctx = canvas.getContext("2d");
 
 
 
+    const canvasMaxX = canvas.width - padding;
+    const canvasMaxY = canvas.height - padding;
+    const canvasMinX = padding;
+    const canvasMinY = padding;
 
-ctx.beginPath()
-ctx.moveTo(...scaledData[0])
-scaledData.slice(1).forEach(point => ctx.lineTo(...point));
-ctx.stroke();
+    scaleToCanvas = (input,inMin,inMax,outMin,outMax) => {
+      const zeroToOne = (input - inMin) / (inMax - inMin);
+      output = outMin + zeroToOne*(outMax - outMin);
+      return output;
+    };
+
+    const dataYs = rawDataTotal[property];
+    const dataXs = timeArray;
+
+    const xMin = Math.min(...dataXs);
+    const xMax = Math.max(...dataXs);
+    const yMin = Math.min(...dataYs);
+    const yMax = Math.max(...dataYs);
+
+
+    const joinedData =[];
+    for(let i=0;i<rawDataTotal[property].length;i++){
+      joinedData.push([timeArray[i],rawDataTotal[property][i]]);
+    }
+
+    console.log(joinedData);
+
+
+    const scaledData = joinedData.map(([x, y]) => [
+      scaleToCanvas(x, xMin, xMax, canvasMinX, canvasMaxX),
+      scaleToCanvas(y, yMin, yMax, canvasMinY, canvasMaxY)
+    ]);
+
+    ctx.beginPath()
+    ctx.moveTo(...scaledData[0])
+    scaledData.slice(1).forEach(point => ctx.lineTo(...point));
+    ctx.stroke();
+
+
+    
+  });
+};
+
+window.addEventListener('resize', () => { 
+
+  console.log(canvases);
+
+  Object.keys(canvases).forEach((property) => {
+    canvases[property].width = canvases[property].parentNode.getBoundingClientRect().width;
+    canvases[property].height = canvases[property].parentNode.getBoundingClientRect().height;
+  });
+
+  updateCanvases();
+
+  
+});
+
+
+
+
+
+
+
 
 sliderCtx.beginPath()
 sliderCtx.moveTo(canvasMaxX/2,canvasMinY);
@@ -75,7 +146,6 @@ document.body.onmouseup = function() {
 
 console.log(data);
 
-console.log(stack.offsetLeft);
 
 onmousemove = function(e){
 	if (e.clientX < canvasMaxX + canvas.offsetLeft && e.clientX > canvasMinX + canvas.offsetLeft && e.clientY < canvasMaxY + canvas.offsetTop && e.clientY > canvasMinY + canvas.offsetTop && mouseDown==1){
