@@ -6,7 +6,7 @@ stackElement.appendChild(ulElement);
 
 
 const rawDataTotal = {}
-const nonTimeProperties = ['velocity','acceleration','rightArmAngle','leftArmAngle','rearStress','frontStress','1','2','4','5','6']
+const nonTimeProperties = ['velocity','acceleration','right Arm Angle','left Arm Angle','rear Stress','front Stress','1','2','4','5','6']
 
 const timeArray = [];
 let k = 1;
@@ -31,16 +31,19 @@ const canvases = {};
 nonTimeProperties.forEach((property) => {
   let liElement = document.createElement("LI");
   const newCanvas = document.createElement("canvas");
-
+  const newHeading = document.createElement("h3");
+  newHeading.innerText = property.toUpperCase();
 
   newCanvas.setAttribute("id",property);
   canvases[property] = newCanvas;
   
+  liElement.appendChild(newHeading);
   liElement.appendChild(canvases[property]);
   ulElement.appendChild(liElement);
   console.log(liElement.getBoundingClientRect().width);
   newCanvas.width = liElement.getBoundingClientRect().width;
   newCanvas.height = liElement.getBoundingClientRect().height;
+
 });
 
 
@@ -55,6 +58,9 @@ const updateCanvases = () =>
 
     const canvas  = canvases[property];
     const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#F8F8F8";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 
 
