@@ -6,7 +6,7 @@ stackElement.appendChild(ulElement);
 
 
 const rawDataTotal = {}
-const nonTimeProperties = ['velocity','acceleration','rightArmAngle','leftArmAngle','rearStress','frontStress']
+const nonTimeProperties = ['velocity','acceleration','rightArmAngle','leftArmAngle','rearStress','frontStress','1','2','4','5','6']
 
 const timeArray = [];
 let k = 1;
@@ -45,7 +45,7 @@ nonTimeProperties.forEach((property) => {
 
 
 
-const padding = 15;
+const padding = 5;
 
 const updateCanvases = () =>
 
@@ -91,6 +91,7 @@ const updateCanvases = () =>
       scaleToCanvas(y, yMin, yMax, canvasMinY, canvasMaxY)
     ]);
 
+    ctx.strokeStyle = "#FF8484";
     ctx.beginPath()
     ctx.moveTo(...scaledData[0])
     scaledData.slice(1).forEach(point => ctx.lineTo(...point));
@@ -100,6 +101,8 @@ const updateCanvases = () =>
     
   });
 };
+
+updateCanvases();
 
 window.addEventListener('resize', () => { 
 
