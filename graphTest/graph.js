@@ -3,10 +3,12 @@
 const stackElement = document.getElementById('stack');
 const ulElement = document.createElement("UL");
 stackElement.appendChild(ulElement);
-
+const sliderCanvas = document.createElement('canvas');
+sliderCanvas.setAttribute('id','sliderCanvas');
+const sliderCtx = sliderCanvas.getContext('2d');
 
 const rawDataTotal = {}
-const nonTimeProperties = ['velocity','acceleration','right Arm Angle','left Arm Angle','rear Stress','front Stress','1','2','4','5','6']
+const nonTimeProperties = ['velocity','acceleration','right Arm Angle','left Arm Angle','rear Stress','front Stress','1','2','4','5','6','hello','laura','data']
 
 const timeArray = [];
 let k = 1;
@@ -14,7 +16,7 @@ nonTimeProperties.forEach((property) => {
   k+=10;
   let rawData = [];
   for (let i = 0; i < 1000; i++){
-    rawData.push([(Math.PI/7* Math.sin(i/k)) + Math.sin(i/5)/20]);
+    rawData.push([(2*i*Math.sin(i/k))]);
   };
   rawDataTotal[property] = rawData
 });
@@ -31,42 +33,55 @@ const canvases = {};
 nonTimeProperties.forEach((property) => {
   let liElement = document.createElement("LI");
   const newCanvas = document.createElement("canvas");
-  const newHeading = document.createElement("h3");
-  newHeading.innerText = property.toUpperCase();
-
-  newCanvas.setAttribute("id",property);
+  const graphInfo = document.createElement("div");
+  const graphTitle = document.createElement("h3");
+  const valueReadout = document.createElement("h4");
+  valueReadout.setAttribute('class','valueReadout')
+  valueReadout.setAttribute('id', property + 'valueReadout')
+  graphInfo.setAttribute('class', 'graphInfo');
+  newCanvas.setAttribute("id", property);
+  
+  graphTitle.innerText = property.toUpperCase();
+  valueReadout.innerText = "16733134.31";
+  
   canvases[property] = newCanvas;
   
-  liElement.appendChild(newHeading);
+  graphInfo.appendChild(graphTitle);
+  graphInfo.appendChild(valueReadout);
+
+  liElement.appendChild(graphInfo);
   liElement.appendChild(canvases[property]);
   ulElement.appendChild(liElement);
   console.log(liElement.getBoundingClientRect().width);
   newCanvas.width = liElement.getBoundingClientRect().width;
-  newCanvas.height = liElement.getBoundingClientRect().height;
+  newCanvas.height = liElement.getBoundingClientRect().height ;
+  sliderCanvas.width = liElement.getBoundingClientRect().width;
+  sliderCanvas.height = ulElement.getBoundingClientRect().height;
 
 });
 
+//ulElement.appendChild(sliderCanvas);
 
 
-const padding = 5;
+
+const padding = 7;
+const paddingLeft = 40;
 
 const updateCanvases = () =>
 
 {
+
+
 
   nonTimeProperties.forEach((property) => {
 
     const canvas  = canvases[property];
     const ctx = canvas.getContext("2d");
 
-    ctx.fillStyle = "#F8F8F8";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-
-
-    const canvasMaxX = canvas.width - padding;
+    const canvasMaxX = canvas.width ;
     const canvasMaxY = canvas.height - padding;
-    const canvasMinX = padding;
+    const canvasMinX = 40;
     const canvasMinY = padding;
 
     scaleToCanvas = (input,inMin,inMax,outMin,outMax) => {
@@ -89,21 +104,39 @@ const updateCanvases = () =>
       joinedData.push([timeArray[i],rawDataTotal[property][i]]);
     }
 
-    console.log(joinedData);
-
-
     const scaledData = joinedData.map(([x, y]) => [
       scaleToCanvas(x, xMin, xMax, canvasMinX, canvasMaxX),
       scaleToCanvas(y, yMin, yMax, canvasMinY, canvasMaxY)
     ]);
 
     ctx.strokeStyle = "#FF8484";
-    ctx.beginPath()
-    ctx.moveTo(...scaledData[0])
+    ctx.beginPath();
+    ctx.moveTo(...scaledData[0]);
     scaledData.slice(1).forEach(point => ctx.lineTo(...point));
+    
     ctx.stroke();
+    ctx.beginPath();
 
+  
+    ctx.fillStyle = '#858585';
+    let topTickPositionY = canvasMinY + padding;
+    let middleTickPositionY = (canvasMaxY + canvasMinY) / 2 + padding / 2;
+    let bottomTickPositionY = canvasMaxY;
 
+    let topTickValue = yMax.toFixed(1);
+    let middleTickValue = ((yMax + yMin) / 2).toFixed(1);
+    let bottomTickValue = yMin.toFixed(1);
+    
+    if (middleTickValue == -0.0){
+      middleTickValue = +0;
+    }
+
+    console.log(middleTickValue);
+
+    ctx.textAlign = 'right';
+    ctx.fillText(topTickValue, paddingLeft - 10, topTickPositionY);
+    ctx.fillText(middleTickValue, paddingLeft - 10, middleTickPositionY);
+    ctx.fillText(bottomTickValue, paddingLeft - 10, bottomTickPositionY);
     
   });
 };
@@ -123,10 +156,6 @@ window.addEventListener('resize', () => {
 
   
 });
-
-
-
-
 
 
 
