@@ -1,27 +1,62 @@
 <html>
 
-    <head>
-    <title>Three.js Practice</title>
+  <head>
+    
     <link rel="stylesheet" href="styles.css">
-    </head>
+  </head>
 
-    <body>
-        <div class="container">
-            <img class="bg" src="backgroundImage.png">
-            <canvas id="carModel"></canvas>
-            <div id="stack">
-		        <canvas id="graph" height="120" width="650"></canvas>
-		        <canvas id="slider" height="120" width="650" ></canvas>
-	        </div>
-        </div>
-		<script src="vectorFourBar.js"></script>
-        <script src="three.js"></script>
-        <script src="OrbitControls.js"></script>
-        <script src="STLLoader.js"></script>
-        <script src="/graphTest/graph.js"></script>
-        <script src="test.js"></script>
-        
-    </body>
+  <body>
+    <div class="viewport">
+      <canvas id="modelCanvas"></canvas>
+    </div>
+    <div id="stack">
+      <div id="graphButtons">
+        <button id="playButton">
+          <svg width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 7.75L0.249999 15.1112L0.25 0.388783L13 7.75Z" fill="#7E7E7E" />
+          </svg>
+        </button>
 
+        <button id="pauseButton">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.25" width="3" height="10" fill="#A9A9A9" />
+            <rect x="6.75" width="3" height="10" fill="#A9A9A9" />
+          </svg>
+        </button>
+
+        <button id="stopButton">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="10" height="10" fill="#A9A9A9" />
+          </svg>
+        </button>
+
+        <button id="speedButton">1 X</button>
+
+        <button id="restartButton">
+          <svg width="15" height="13" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M15 8.58307e-06L5.66667 6.20652L15 12.413L15 10.4659L8.5948 6.20655L15 1.94719L15 8.58307e-06Z" fill="#7E7E7E" />
+            <rect x="2" y="12" width="2" height="12" transform="rotate(-180 2 12)" fill="#7E7E7E" />
+          </svg>
+        </button>
+
+        <button id="timeButton">00:25:27</button>
+      </div>
+        <li id="graphOverviewBackground">
+          <div class="overviewWrapper">
+            <div id="overviewSeeker" ></div>
+            <div class="overviewSlider" id="overviewSliderStart" >
+               <div class="overviewSliderCenterTick"></div>
+            </div>
+            <canvas id="graphOverview"></canvas>
+          </div>
+        </li>
+      <div id="graphTimeBar"></div>
+    </div>
+  </body>
+  <script src="vectorFourBar.js"></script>
+  <script src="three.js"></script>
+  <script src="OrbitControls.js"></script>
+  <script src="STLLoader.js"></script>
+  <script src="graph.js"></script>
 </html>
-
