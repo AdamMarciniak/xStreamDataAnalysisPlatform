@@ -1,0 +1,24 @@
+{
+  "name": "xStreamDataAnalysisPlatform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/polishdude20/xStreamDataAnalysisPlatform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/polishdude20/xStreamDataAnalysisPlatform/issues"
+  },
+  "homepage": "https://github.com/polishdude20/xStreamDataAnalysisPlatform#readme",
+  "devDependencies": {
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9"
+  }
+}
