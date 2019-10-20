@@ -4,6 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "start": "npm run webpack",
+    "webpack": "webpack -d --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,5 +22,8 @@
   "devDependencies": {
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
+  },
+  "dependencies": {
+    "three": "^0.109.0"
   }
 }

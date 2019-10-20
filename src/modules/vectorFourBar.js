@@ -293,4 +293,4 @@ class VectorFourBar{
     }
 }
 
-//module.exports = VectorFourBar;
+module.exports = VectorFourBar;
