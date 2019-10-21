@@ -196,16 +196,13 @@ const drawOverviewCanvas = () => {
 
 const updateCanvases = (startRatio, endRatio, seekerPositionRatio) => {
   drawOverviewCanvas();
-  console.log("START  " + startRatio);
 
 
   let seekerToWindowRatio = 0;
   if (seekerPositionRatio > startRatio && seekerPositionRatio < endRatio){
     seekerToWindowRatio = (seekerPositionRatio - startRatio) / (endRatio - startRatio);
   }
-  console.log("SEEKER WINDOW   " + seekerToWindowRatio);
 
-  console.log("END  " + endRatio);
 
 
   nonTimeProperties.forEach((property) => {
@@ -274,7 +271,8 @@ window.addEventListener('resize', () => {
   overviewCanvas.width = overviewCanvas.parentNode.getBoundingClientRect().width * 4 ;
   drawOverviewCanvas();
   updateCanvases(startRatio, endRatio, seekerPositionRatio);
-
+  Model.resizeCanvasToDisplaySize();
+  Model.renderOnce();
   const overviewRect = overviewCanvas.getBoundingClientRect();
   const overviewWidth = overviewRect.right - overviewRect.left;
   overviewSeeker.style.left = seekerRatio * (overviewWidth-1);
@@ -358,18 +356,17 @@ overviewCanvas.addEventListener('mousedown', (event) => {
   Slider.makeDragHandler(positionNearestEdge);
 });
 
-Model.resizeCanvasToDisplaySize();
 setupButtons();
 const data = DataManager.createFakeData(nonTimeProperties, NUM_FAKE_DATA_POINTS);
 const timeArray = DataManager.getTimeArrayFromData(data);
 const minsAndMaxes = DataManager.getDataMinsAndMaxes(data);
 const overviewPoints = DataManager.convertToSparseData(data, NUM_OVERVIEW_POINTS);
-
+Model.renderSetup();
+Model.resizeCanvasToDisplaySize();
 const canvases = createCanvases(nonTimeProperties);
 updateCanvases(0.1, 1, 0);
 
 let requestId = undefined;
-
 Model.animate(0, 0, 0);
 
 

@@ -42,104 +42,9 @@ const wheelLeft = new THREE.Mesh();
 let frame = new THREE.Mesh();
 let loader = new STLLoader();
 
-loader.load('./../../stl/topArm.stl', function (geometry) {
-  topArmLeft.geometry = geometry;
-  topArmLeft.material = material;
-  topArmLeft.scale.set(scale, scale, scale);
-  topArmRight.geometry = geometry;
-  topArmRight.material = material;
-  topArmRight.scale.set(scale, scale, scale);
-});
-
-loader.load('./../../stl/BottomArm.stl', function (geometry) {
-  botArmLeft.geometry = geometry;
-  botArmLeft.material = material;
-  botArmLeft.scale.set(scale, scale, scale);
-  botArmRight.geometry = geometry;
-  botArmRight.material = material;
-  botArmRight.scale.set(scale, scale, scale);
-});
-
-loader.load('./../../stl/wheel.stl', function (geometry) {
-  wheelLeft.geometry = geometry;
-  wheelLeft.material = material;
-  wheelLeft.scale.set(5.5, 5.5, 4.25);
-  wheelRight.geometry = geometry;
-  wheelRight.material = material;
-  wheelRight.scale.set(5.5, 5.5, 4.25);
-});
-
-loader.load('./../../stl/knuckle.stl', function (geometry) {
-  knuckleLeft.geometry = geometry;
-  knuckleLeft.material = material;
-  knuckleLeft.scale.set(scale, scale, scale);
-  knuckleRight.geometry = geometry;
-  knuckleRight.material = material;
-  knuckleRight.scale.set(scale, scale, scale);
-});
-
-loader.load('./../../stl/Frame.stl', function (geometry) {
-  frame.geometry = geometry;
-  frame.material = material;
-  frame.scale.set(scale, scale, scale);
-});
-
-knuckleWheelGroupRight.add(knuckleRight);
-knuckleWheelGroupLeft.add(knuckleLeft);
-
-knuckleWheelGroupRight.add(wheelRight);
-knuckleWheelGroupLeft.add(wheelLeft);
-
-wheelRight.rotateZ(Math.PI / 2);
-wheelLeft.rotateZ(Math.PI / 2);
-
-wheelRight.position.set(-220, -95, 0);
-wheelLeft.position.set(-220, -95, 0);
-
-wheelLeft.rotateX(Math.PI / 2);
-wheelRight.rotateX(Math.PI / 2);
-
-botArmRight.position.set(0, -158.66, -157.99);
-botArmLeft.position.set(0, -158.66, -157.99);
-
-knuckleWheelGroupRight.position.set(0, 0, 419.09);
-knuckleWheelGroupLeft.position.set(0, 0, 419.09);
-
-knuckleWheelGroupRight.rotation.y = 3.14159 / 2;
-knuckleWheelGroupLeft.rotation.y = 3.14159 / 2;
-
-frame.position.set(-559, -65, -187);
-frame.rotation.y = Math.PI / 2;
-frame.rotateX(+0.2);
-
-armTopKnuckleGroupLeft.add(topArmLeft);
-armTopKnuckleGroupRight.add(topArmRight);
-
-armTopKnuckleGroupLeft.add(knuckleWheelGroupLeft)
-armTopKnuckleGroupRight.add(knuckleWheelGroupRight)
-
-suspensionGroupRight.add(armTopKnuckleGroupRight);
-suspensionGroupLeft.add(armTopKnuckleGroupLeft);
-
-suspensionGroupRight.add(botArmRight);
-suspensionGroupLeft.add(botArmLeft);
-
-suspensionGroupLeft.position.set(0, 0, -370);
-suspensionGroupLeft.rotateY(Math.PI);
-
-masterGroup.add(frame);
-masterGroup.add(suspensionGroupRight);
-masterGroup.add(suspensionGroupLeft);
-
-scene.add(masterGroup);
-masterGroup.position.set(800, 0, 0);
-
-camera.position.set(1700, 1000, 1200);
-controls.update();
-
-masterGroup.rotation.z = 0.2;
 
 export function resizeCanvasToDisplaySize() {
+  console.log('resized');
   const canvas = renderer.domElement;
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
@@ -150,9 +55,118 @@ export function resizeCanvasToDisplaySize() {
   }
 }
 
-resizeCanvasToDisplaySize
-controls.update();
-renderer.render(scene, camera);
+
+
+const renderSetup = () => {
+  loader.load('./../../stl/topArm.stl', function (geometry) {
+    topArmLeft.geometry = geometry;
+    topArmLeft.material = material;
+    topArmLeft.scale.set(scale, scale, scale);
+    topArmRight.geometry = geometry;
+    topArmRight.material = material;
+    topArmRight.scale.set(scale, scale, scale);
+  });
+
+  loader.load('./../../stl/BottomArm.stl', function (geometry) {
+    botArmLeft.geometry = geometry;
+    botArmLeft.material = material;
+    botArmLeft.scale.set(scale, scale, scale);
+    botArmRight.geometry = geometry;
+    botArmRight.material = material;
+    botArmRight.scale.set(scale, scale, scale);
+  });
+
+  loader.load('./../../stl/wheel.stl', function (geometry) {
+    wheelLeft.geometry = geometry;
+    wheelLeft.material = material;
+    wheelLeft.scale.set(5.5, 5.5, 4.25);
+    wheelRight.geometry = geometry;
+    wheelRight.material = material;
+    wheelRight.scale.set(5.5, 5.5, 4.25);
+  });
+
+  loader.load('./../../stl/knuckle.stl', function (geometry) {
+    knuckleLeft.geometry = geometry;
+    knuckleLeft.material = material;
+    knuckleLeft.scale.set(scale, scale, scale);
+    knuckleRight.geometry = geometry;
+    knuckleRight.material = material;
+    knuckleRight.scale.set(scale, scale, scale);
+  });
+
+  loader.load('./../../stl/Frame.stl', function (geometry) {
+    frame.geometry = geometry;
+    frame.material = material;
+    frame.scale.set(scale, scale, scale);
+  });
+
+  knuckleWheelGroupRight.add(knuckleRight);
+  knuckleWheelGroupLeft.add(knuckleLeft);
+
+  knuckleWheelGroupRight.add(wheelRight);
+  knuckleWheelGroupLeft.add(wheelLeft);
+
+  wheelRight.rotateZ(Math.PI / 2);
+  wheelLeft.rotateZ(Math.PI / 2);
+
+  wheelRight.position.set(-220, -95, 0);
+  wheelLeft.position.set(-220, -95, 0);
+
+  wheelLeft.rotateX(Math.PI / 2);
+  wheelRight.rotateX(Math.PI / 2);
+
+  botArmRight.position.set(0, -158.66, -157.99);
+  botArmLeft.position.set(0, -158.66, -157.99);
+
+  knuckleWheelGroupRight.position.set(0, 0, 419.09);
+  knuckleWheelGroupLeft.position.set(0, 0, 419.09);
+
+  knuckleWheelGroupRight.rotation.y = 3.14159 / 2;
+  knuckleWheelGroupLeft.rotation.y = 3.14159 / 2;
+
+  frame.position.set(-559, -65, -187);
+  frame.rotation.y = Math.PI / 2;
+  frame.rotateX(+0.2);
+
+  armTopKnuckleGroupLeft.add(topArmLeft);
+  armTopKnuckleGroupRight.add(topArmRight);
+
+  armTopKnuckleGroupLeft.add(knuckleWheelGroupLeft)
+  armTopKnuckleGroupRight.add(knuckleWheelGroupRight)
+
+  suspensionGroupRight.add(armTopKnuckleGroupRight);
+  suspensionGroupLeft.add(armTopKnuckleGroupLeft);
+
+  suspensionGroupRight.add(botArmRight);
+  suspensionGroupLeft.add(botArmLeft);
+
+  suspensionGroupLeft.position.set(0, 0, -370);
+  suspensionGroupLeft.rotateY(Math.PI);
+
+  masterGroup.add(frame);
+  masterGroup.add(suspensionGroupRight);
+  masterGroup.add(suspensionGroupLeft);
+
+  scene.add(masterGroup);
+  masterGroup.position.set(800, 0, 0);
+
+  camera.position.set(1700, 1000, 1200);
+  controls.update();
+
+  masterGroup.rotation.z = 0.2;
+
+  resizeCanvasToDisplaySize
+  controls.update();
+  console.log('RENDERRR');
+  controls.addEventListener('change', renderOnce); 
+  renderer.render(scene, camera);
+
+
+};
+
+export const renderOnce = () => {
+  renderer.render(scene, camera);
+};
 
 
 
@@ -180,4 +194,4 @@ function animate(left, right, sway) {
   renderer.render(scene, camera);
 }
 
-export {animate}
+export {animate, renderSetup}
