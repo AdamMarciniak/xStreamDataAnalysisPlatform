@@ -1,18 +1,17 @@
 
-import * as Simulation from './Simulation.js';
-
-const SAMPLE_PERIOD_SECONDS = 0.1;
+const SAMPLE_PERIOD_SECONDS = 0.01;
 const createFakeRawData = (nonTimeProperties, numDataPoints) => {
   const timeArray = [];
   const allRawData = {};
   let rawData = {};
   let k = 1;
   const createFakeData = nonTimeProperties.forEach((property) => {
-    k += 10;
     let yValues = [];
     for (let i = 0; i < numDataPoints; i++) {
       timeArray[i] = ((SAMPLE_PERIOD_SECONDS * i));
-      yValues[i] = (0.5 * Math.sin(i / 10 - Math.PI / 2 * k));
+      k = timeArray[i];
+      yValues[i] = -0.5 * Math.sin(k*20)/Math.exp(k*4) + 0.005 * Math.sin(i);
+  
     };
     rawData[property] = yValues;
   });

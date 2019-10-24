@@ -6,8 +6,8 @@ import * as Simulation from './modules/Simulation.js';
 
 const PADDING = 7;
 const PADDING_LEFT = 40;
-const NUM_OVERVIEW_POINTS = 500;
-const NUM_FAKE_DATA_POINTS = 10000;
+const NUM_OVERVIEW_POINTS = 2000;
+const NUM_FAKE_DATA_POINTS = 5000;
 const OVERVIEW_ROW_HEIGHT = 40;
 let startRatio = 0;
 let endRatio = 1;
@@ -19,7 +19,6 @@ const ulElement = document.createElement('ul');
 stackElement.appendChild(ulElement);
 const sliderCanvas = document.createElement('canvas');
 sliderCanvas.setAttribute('id','sliderCanvas');
-const sliderCtx = sliderCanvas.getContext('2d');
 const overviewCanvas = document.getElementById('graphOverview');
 const overviewCanvasCtx = overviewCanvas.getContext('2d');
 const playButton = document.getElementById('playButton');
@@ -27,9 +26,7 @@ const pauseButton = document.getElementById('pauseButton');
 const stopButton = document.getElementById('stopButton');
 const speedButton = document.getElementById('speedButton');
 const overviewSliderStart = document.getElementById('overviewSliderStart');
-const overviewSliderEnd = document.getElementById('overviewSliderEnd');
 const overviewSeeker = document.getElementById('overviewSeeker');
-
 
 const getElementWidth = (element) => {
   const elementRect = element.getBoundingClientRect();
@@ -51,56 +48,54 @@ const getDataUnderSeeker = (seekerIndex, data) => {
   return dataUnderSeeker;
 }
 
-
 let seekerPosition = 0;
 let seekerRatio = 0;
 let timeIndex = 0;
 let seekerPositionRatio = 0;
 let pausedIndex = 0;
 
-
-
-
 const scaleValues = (input, inMin, inMax, outMin, outMax) => {
   return outMin + ((input - inMin) / (inMax - inMin)) * (outMax - outMin);
 };
 
 let pressedPlayTime = 0;
-
+let timePassedSincePlay = 0;
+let start = null;
 const setupButtons = () => {
   playState = 0;
-  const speedOptions = [1, 2, 4, 10];
-  let speedState = 0;
-  seekerSpeed = speedOptions[speedState];
+  const speedOptions = [1, 0.5, 0.25, 0.1];
+  let speedState = 1;
+  seekerSpeed = speedOptions[speedState-1];
   pauseButton.addEventListener('click', function () {
     if (playState == 1) {
       pauseButton.className = 'activeButton';
       playButton.classList.remove('activeButton');
       pauseSimulation();
       playState = 0;
+      timePassedSincePlay = 0;
+      oldTimestamp = 0;
     }
   });
   speedButton.addEventListener('click', function () {
-    if (speedState < speedOptions.length - 1) {
-      speedState += 1;
+    if (speedState < speedOptions.length) {
       seekerSpeed = speedOptions[speedState];
       speedButton.innerText = seekerSpeed + ' X';
+      speedState += 1;
+
     }
     else {
-      speedState = 0;
-      let speed = speedOptions[speedState];
+      speedState = 1;
+      seekerSpeed = speedOptions[speedState-1];
       speedButton.innerText = seekerSpeed + ' X';
     }
   });
   playButton.addEventListener('click', function () {
     if (playState == 0) {
-      
-      pressedPlayTime = Date.now();
       playButton.className = 'activeButton';
       playState = 1;
       pauseButton.classList.remove('activeButton');
       animateState = 1;
-      simulate();
+      requestAnimationFrame(simulate);
     }
   });
   stopButton.addEventListener('click', function () {
@@ -112,7 +107,9 @@ const setupButtons = () => {
     seekerPositionRatio = 0;
     stopSimulation();
     overviewSeeker.style.left = seekerPosition
-
+    timePassedSincePlay = 0;
+    oldTimestamp = 0;
+    pauseIndex = 0;
   });
 };
 
@@ -148,7 +145,7 @@ const createCanvases = (nonTimeProperties) => {
 const updateValueReadout = (seekerData) => {
   Object.keys(seekerData).forEach(function (property) {
     let valueReadout = document.getElementById(property + 'valueReadout');
-    valueReadout.innerText = "y: " + seekerData[property][1].toFixed(2);
+    valueReadout.innerText = (-seekerData[property][1] * 45).toFixed(5);
   });
 
 }
@@ -242,23 +239,6 @@ const updateCanvases = (startRatio, endRatio, seekerPositionRatio) => {
       ctx.lineTo(seekerXPosition, canvasMinY);
       ctx.stroke();
     }
-  
-
-
-   
-    let topTickPositionY = canvasMinY + PADDING;
-    let middleTickPositionY = (canvasMaxY + canvasMinY) / 2 + PADDING / 2;
-    let bottomTickPositionY = canvasMaxY;
-    let topTickValue = minsAndMaxes[property]['max'].toFixed(1);
-    let middleTickValue = ((minsAndMaxes[property]['max'] + minsAndMaxes[property]['min']) / 2).toFixed(1);
-    let bottomTickValue = minsAndMaxes[property]['min'].toFixed(1);
-    ctx.beginPath();
-    ctx.fillStyle = '#858585';
-    ctx.font = '35px Roboto'
-    ctx.textAlign = 'right';
-    ctx.fillText(topTickValue,4* PADDING_LEFT - 10, topTickPositionY);
-    ctx.fillText(middleTickValue, 4*PADDING_LEFT - 10, middleTickPositionY);
-    ctx.fillText(bottomTickValue, 4*PADDING_LEFT - 10, bottomTickPositionY);
   });
 };
 
@@ -277,8 +257,6 @@ window.addEventListener('resize', () => {
   const overviewWidth = overviewRect.right - overviewRect.left;
   overviewSeeker.style.left = seekerRatio * (overviewWidth-1);
 });
-
-
 
 const makeEdgePositioner = (elementToMove, originalY, originalZoom) => {
   return (event) => {
@@ -344,7 +322,6 @@ overviewCanvas.addEventListener('mousedown', (event) => {
     [event.clientX, event.clientY], 
     [overviewSliderStart]
   );
-  
   let sliderWindowRect = overviewSliderStart.getBoundingClientRect();
   let overviewRect = overviewCanvas.getBoundingClientRect();
   let sliderWindowWidth = sliderWindowRect.right - sliderWindowRect.left;
@@ -361,21 +338,22 @@ const data = DataManager.createFakeData(nonTimeProperties, NUM_FAKE_DATA_POINTS)
 const timeArray = DataManager.getTimeArrayFromData(data);
 const minsAndMaxes = DataManager.getDataMinsAndMaxes(data);
 const overviewPoints = DataManager.convertToSparseData(data, NUM_OVERVIEW_POINTS);
-Model.renderSetup();
+Model.loadAllGeometry();
 Model.resizeCanvasToDisplaySize();
 const canvases = createCanvases(nonTimeProperties);
 updateCanvases(0.1, 1, 0);
 
 let requestId = undefined;
-Model.animate(0, 0, 0);
-
-
-const simulate = () => {
-
+let oldTimestamp = 0;
+const simulate = (timestamp) => {
+    if (oldTimestamp == 0) oldTimestamp = timestamp;
+    const delta = (timestamp - oldTimestamp) * seekerSpeed;
     const overviewWidth = getElementWidth(overviewCanvas);
-    const timePassedSincePlay = Date.now() - pressedPlayTime;
-          timeIndex = Simulation.getClosestIndex(timePassedSincePlay / 100, timeArray) + pausedIndex;
-          seekerPositionRatio = Math.min(0.99, timeIndex / timeArray.length);
+    timePassedSincePlay += delta;
+    console.log(timePassedSincePlay);
+    timeIndex = Simulation.getClosestIndex((timePassedSincePlay  / 1000), timeArray) + pausedIndex;
+    seekerPositionRatio = Math.min(0.99, timeIndex / timeArray.length);
+    console.log(timeArray[timeIndex]);
     const seekerData = getDataUnderSeeker(timeIndex, data);
     const frontLeftSuspensionAngle = seekerData[nonTimeProperties[0]][1];
     const frontRightSuspensionAngle = seekerData[nonTimeProperties[1]][1];
@@ -384,9 +362,9 @@ const simulate = () => {
     overviewSeeker.style.left = seekerPosition; 
     Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, bodySwayAngle);
     updateCanvases(startRatio, endRatio, seekerPositionRatio);
+    oldTimestamp = timestamp;
     requestId = requestAnimationFrame(simulate);
-
-
+    updateValueReadout(seekerData);
 }
 
 const stopSimulation = () => {
@@ -399,10 +377,8 @@ const stopSimulation = () => {
   Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, bodySwayAngle);
   overviewSeeker.style.left = 0;
   updateCanvases(startRatio, endRatio, seekerPositionRatio);
-
-  
+  pausedIndex = 0;
 }
-
 
 const pauseSimulation = () => {
   pausedIndex = timeIndex;

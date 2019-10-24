@@ -8,12 +8,6 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth
   / window.innerHeight, 0.1, 7000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('modelCanvas'), antialias: true });
-document.body.appendChild(renderer.domElement);
-scene.background = new THREE.Color(0xE5E5E5);
-const material = new THREE.MeshPhongMaterial({ color: 0x606060 });
-var light = new THREE.DirectionalLight(0xffffff);
-light.position.set(0, 1, 1).normalize();
-scene.add(light);
 
 const Four = new FourBar;
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -42,7 +36,6 @@ const wheelLeft = new THREE.Mesh();
 let frame = new THREE.Mesh();
 let loader = new STLLoader();
 
-
 export function resizeCanvasToDisplaySize() {
   console.log('resized');
   const canvas = renderer.domElement;
@@ -55,50 +48,124 @@ export function resizeCanvasToDisplaySize() {
   }
 }
 
+// const loadStlFiles = () => {
+//   loader.load('./../../stl/topArm.stl', function (geometry) {
+//     topArmLeft.geometry = geometry;
+//     topArmRight.geometry = geometry;
+//   });
+
+//   loader.load('./../../stl/BottomArm.stl', function (geometry) {
+//     botArmLeft.geometry = geometry;
+//     botArmRight.geometry = geometry;
+//   });
+
+//   loader.load('./../../stl/wheel.stl', function (geometry) {
+//     wheelLeft.geometry = geometry;
+//     wheelRight.geometry = geometry;
+//   });
+
+//   loader.load('./../../stl/knuckle.stl', function (geometry) {
+//     knuckleLeft.geometry = geometry;
+//     knuckleRight.geometry = geometry;
+//   });
+
+//   loader.load('./../../stl/Frame.stl', function (geometry) {
+//     frame.geometry = geometry;
+//   });
+// }
+
+const loadTopArm = () => {
+  return new Promise(resolve => {
+    return loader.load('./../../stl/topArm.stl', resolve);
+  });
+}
+
+const loadBottomArm = () => {
+  return new Promise(resolve => {
+    return loader.load('./../../stl/BottomArm.stl', resolve);
+  });
+}
+
+const loadWheel = () => {
+  return new Promise(resolve => {
+    return loader.load('./../../stl/wheel.stl', resolve);
+  });
+}
+
+const loadKnuckle = () => {
+  return new Promise(resolve => {
+    return loader.load('./../../stl/knuckle.stl', resolve);
+  });
+}
+
+const loadFrame = () => {
+  return new Promise(resolve => {
+    return loader.load('./../../stl/Frame.stl', resolve);
+  });
+}
+
+export const loadAllGeometry = () => {
+  const promises = [
+    loadTopArm(),
+    loadBottomArm(),
+    loadWheel(),
+    loadKnuckle(),
+    loadFrame()
+  ];
+
+  return Promise.all(promises).then(result => {
+    topArmLeft.geometry = result[0];
+    topArmRight.geometry = result[0];
+    botArmLeft.geometry = result[1];
+    botArmRight.geometry = result[1];
+    wheelLeft.geometry = result[2];
+    wheelRight.geometry = result[2];
+    knuckleLeft.geometry = result[3];
+    knuckleRight.geometry = result[3];
+    frame.geometry = result[4];
+    console.log("PROMISES FULFILLED!");
+    renderSetup();
+  });
+}
+
+const scaleGeometries = () => {
+  topArmLeft.scale.set(scale, scale, scale);
+  topArmRight.scale.set(scale, scale, scale);
+  botArmRight.scale.set(scale, scale, scale);
+  botArmLeft.scale.set(scale, scale, scale);
+  wheelRight.scale.set(5.5, 5.5, 3.6);
+  wheelLeft.scale.set(5.5, 5.5, 3.6);
+  knuckleLeft.scale.set(scale, scale, scale);
+  knuckleRight.scale.set(scale, scale, scale);
+  frame.scale.set(scale, scale, scale);
+}
+
+const applyMaterials = () => {
+  const material = new THREE.MeshPhongMaterial({ color: 0x606060 });
+  topArmLeft.material = material;
+  topArmRight.material = material;
+  botArmLeft.material = material;
+  botArmRight.material = material;
+  wheelLeft.material = material;
+  wheelRight.material = material;
+  knuckleLeft.material = material;
+  knuckleRight.material = material;
+  frame.material = material;
+}
+
 
 
 const renderSetup = () => {
-  loader.load('./../../stl/topArm.stl', function (geometry) {
-    topArmLeft.geometry = geometry;
-    topArmLeft.material = material;
-    topArmLeft.scale.set(scale, scale, scale);
-    topArmRight.geometry = geometry;
-    topArmRight.material = material;
-    topArmRight.scale.set(scale, scale, scale);
-  });
 
-  loader.load('./../../stl/BottomArm.stl', function (geometry) {
-    botArmLeft.geometry = geometry;
-    botArmLeft.material = material;
-    botArmLeft.scale.set(scale, scale, scale);
-    botArmRight.geometry = geometry;
-    botArmRight.material = material;
-    botArmRight.scale.set(scale, scale, scale);
-  });
+  document.body.appendChild(renderer.domElement);
+  scene.background = new THREE.Color(0xE5E5E5);
+  var light = new THREE.DirectionalLight(0xffffff);
+  light.position.set(0, 1, 1).normalize();
+  scene.add(light);
 
-  loader.load('./../../stl/wheel.stl', function (geometry) {
-    wheelLeft.geometry = geometry;
-    wheelLeft.material = material;
-    wheelLeft.scale.set(5.5, 5.5, 4.25);
-    wheelRight.geometry = geometry;
-    wheelRight.material = material;
-    wheelRight.scale.set(5.5, 5.5, 4.25);
-  });
-
-  loader.load('./../../stl/knuckle.stl', function (geometry) {
-    knuckleLeft.geometry = geometry;
-    knuckleLeft.material = material;
-    knuckleLeft.scale.set(scale, scale, scale);
-    knuckleRight.geometry = geometry;
-    knuckleRight.material = material;
-    knuckleRight.scale.set(scale, scale, scale);
-  });
-
-  loader.load('./../../stl/Frame.stl', function (geometry) {
-    frame.geometry = geometry;
-    frame.material = material;
-    frame.scale.set(scale, scale, scale);
-  });
+  // loadStlFiles();
+  applyMaterials();
+  scaleGeometries();
 
   knuckleWheelGroupRight.add(knuckleRight);
   knuckleWheelGroupLeft.add(knuckleLeft);
@@ -161,18 +228,15 @@ const renderSetup = () => {
   controls.addEventListener('change', renderOnce); 
   renderer.render(scene, camera);
 
-
 };
 
 export const renderOnce = () => {
   renderer.render(scene, camera);
 };
 
-
-
 function animate(left, right, sway) {
 
-  masterGroup.rotation.x = -sway * 0.1;
+  masterGroup.position.y = -sway * 30;
   armTopKnuckleGroupLeft.rotation.x = left;
   armTopKnuckleGroupRight.rotation.x = right;
 
@@ -190,8 +254,13 @@ function animate(left, right, sway) {
 
   botArmRight.rotation.x = outputRight.open - 3.14159 / 2 - 45 * 3.14159 / 180;
   knuckleWheelGroupRight.rotation.x = -couplerRight.open + 50 * 3.14159 / 180 - armTopKnuckleGroupRight.rotation.x;
+
+  wheelRight.rotation.x +=  0.1;
+  wheelLeft.rotation.x += -0.1;
+
   controls.update();
   renderer.render(scene, camera);
+  
 }
 
-export {animate, renderSetup}
+export {animate}
