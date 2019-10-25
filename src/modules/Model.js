@@ -37,7 +37,6 @@ let frame = new THREE.Mesh();
 let loader = new STLLoader();
 
 export function resizeCanvasToDisplaySize() {
-  console.log('resized');
   const canvas = renderer.domElement;
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
@@ -123,7 +122,7 @@ export const loadAllGeometry = () => {
     knuckleLeft.geometry = result[3];
     knuckleRight.geometry = result[3];
     frame.geometry = result[4];
-    console.log("PROMISES FULFILLED!");
+    console.log("All STL Loaded!");
     renderSetup();
   });
 }
@@ -224,7 +223,6 @@ const renderSetup = () => {
 
   resizeCanvasToDisplaySize
   controls.update();
-  console.log('RENDERRR');
   controls.addEventListener('change', renderOnce); 
   renderer.render(scene, camera);
 
@@ -234,9 +232,11 @@ export const renderOnce = () => {
   renderer.render(scene, camera);
 };
 
-function animate(left, right, sway) {
+function animate(left, right, xAngle, yAngle) {
 
-  masterGroup.position.y = -sway * 30;
+  masterGroup.rotation.x = -xAngle;
+  masterGroup.rotation.y = -yAngle;
+
   armTopKnuckleGroupLeft.rotation.x = left;
   armTopKnuckleGroupRight.rotation.x = right;
 
@@ -260,7 +260,7 @@ function animate(left, right, sway) {
 
   controls.update();
   renderer.render(scene, camera);
-  
+
 }
 
 export {animate}

@@ -4,6 +4,7 @@ import * as DataManager from './modules/DataManager.js';
 import * as Model from './modules/Model.js';
 import * as Simulation from './modules/Simulation.js';
 
+
 const PADDING = 7;
 const PADDING_LEFT = 40;
 const NUM_OVERVIEW_POINTS = 2000;
@@ -11,6 +12,10 @@ const NUM_FAKE_DATA_POINTS = 5000;
 const OVERVIEW_ROW_HEIGHT = 40;
 let startRatio = 0;
 let endRatio = 1;
+let sensorVal = 0;
+let xAngle = 0;
+let yAngle = 0;
+
 
 const nonTimeProperties = ['Right Arm Angle', 'Left Arm Angle', 'Body Sway'];
 
@@ -109,7 +114,6 @@ const setupButtons = () => {
     overviewSeeker.style.left = seekerPosition
     timePassedSincePlay = 0;
     oldTimestamp = 0;
-    pauseIndex = 0;
   });
 };
 
@@ -337,7 +341,7 @@ setupButtons();
 const data = DataManager.createFakeData(nonTimeProperties, NUM_FAKE_DATA_POINTS);
 const timeArray = DataManager.getTimeArrayFromData(data);
 const minsAndMaxes = DataManager.getDataMinsAndMaxes(data);
-const overviewPoints = DataManager.convertToSparseData(data, NUM_OVERVIEW_POINTS);
+let overviewPoints = DataManager.convertToSparseData(data, NUM_OVERVIEW_POINTS);
 Model.loadAllGeometry();
 Model.resizeCanvasToDisplaySize();
 const canvases = createCanvases(nonTimeProperties);
@@ -345,22 +349,26 @@ updateCanvases(0.1, 1, 0);
 
 let requestId = undefined;
 let oldTimestamp = 0;
+const sensorMax = 2120;
+const sensorMin = 1580;
+const sensorRange = sensorMax-sensorMin;
+const angleRange = Math.PI;
+const angleToSensorRatio = angleRange/sensorRange;
+let sensorAngle = 0;
 const simulate = (timestamp) => {
     if (oldTimestamp == 0) oldTimestamp = timestamp;
     const delta = (timestamp - oldTimestamp) * seekerSpeed;
     const overviewWidth = getElementWidth(overviewCanvas);
     timePassedSincePlay += delta;
-    console.log(timePassedSincePlay);
     timeIndex = Simulation.getClosestIndex((timePassedSincePlay  / 1000), timeArray) + pausedIndex;
     seekerPositionRatio = Math.min(0.99, timeIndex / timeArray.length);
-    console.log(timeArray[timeIndex]);
     const seekerData = getDataUnderSeeker(timeIndex, data);
     const frontLeftSuspensionAngle = seekerData[nonTimeProperties[0]][1];
     const frontRightSuspensionAngle = seekerData[nonTimeProperties[1]][1];
     const bodySwayAngle = seekerData[nonTimeProperties[2]][1];
     seekerPosition = seekerPositionRatio * (overviewWidth - 1);
     overviewSeeker.style.left = seekerPosition; 
-    Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, bodySwayAngle);
+    Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, xAngle, yAngle);
     updateCanvases(startRatio, endRatio, seekerPositionRatio);
     oldTimestamp = timestamp;
     requestId = requestAnimationFrame(simulate);
@@ -384,6 +392,30 @@ const pauseSimulation = () => {
   pausedIndex = timeIndex;
   cancelAnimationFrame(requestId);
 }
+
+
+const establishWebsockets = () => {
+
+  const ws = new WebSocket('ws://192.99.54.136:1024');
+
+  ws.onopen = function (event) {
+    ws.send('Web Client Connected');
+  };
+
+  ws.onmessage = function (event){
+    const message = event.data;
+    if (message[0] == 'x'){
+      xAngle = message.substring(1);
+    }
+    if (message[0] == 'y') {
+      yAngle = message.substring(1);
+    }
+
+  };
+
+}
+
+establishWebsockets();
 
 
 

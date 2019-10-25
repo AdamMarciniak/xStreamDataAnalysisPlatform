@@ -1,5 +1,7 @@
 
 const SAMPLE_PERIOD_SECONDS = 0.01;
+let allPropertyPoints;
+
 const createFakeRawData = (nonTimeProperties, numDataPoints) => {
   const timeArray = [];
   const allRawData = {};
@@ -89,9 +91,10 @@ const convertToSparseData = (allPropertyPoints, numPoints) => {
   return reducedPoints;
 };
 
+
 const createFakeData = (propertyNames, NUM_FAKE_DATA_POINTS ) => {
   const allRawData = createFakeRawData(propertyNames, NUM_FAKE_DATA_POINTS);
-  const allPropertyPoints = convertDataToPointPairs(allRawData);
+  allPropertyPoints = convertDataToPointPairs(allRawData);
 
   return allPropertyPoints;
 }
@@ -105,6 +108,16 @@ export const getTimeArrayFromData = (data) => {
     timeArray[i] = data[keys[0]][i][0];
   }
   return timeArray;
+
+}
+
+
+export const pushNewData = (newData) => {
+  const fullLength = allPropertyPoints['Body Sway'].length;
+  console.log(fullLength);
+  const oldTime = allPropertyPoints['Body Sway'][fullLength-1][0]
+  const newTime = oldTime + SAMPLE_PERIOD_SECONDS;
+  allPropertyPoints['Body Sway'].push([newData,newTime]);
 
 }
 
