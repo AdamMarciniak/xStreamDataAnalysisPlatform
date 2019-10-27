@@ -1,6 +1,37 @@
 
 const SAMPLE_PERIOD_SECONDS = 0.01;
 let allPropertyPoints;
+const sensorConfig = require('../../config/sensorConfig.json');
+
+const realtimeData = {};
+
+
+export const setupRealtimeData = () => {
+  Object.keys(sensorConfig).forEach((sensor) => {
+    realtimeData[sensor] = {'x': [],
+                            'y': [],
+                            'min': sensorConfig[sensor].min,
+                            'max': sensorConfig[sensor].max};
+  })
+
+  console.log(realtimeData);
+}
+
+export const addToRealtimeData = (sensor, xVal, yVal) => {
+  realtimeData[sensor].x.push(xVal);
+  realtimeData[sensor].y.push(yVal);
+};
+
+export const getRealtimeData = () => {
+  return realtimeData;
+};
+
+
+
+
+
+
+
 
 const createFakeRawData = (nonTimeProperties, numDataPoints) => {
   const timeArray = [];

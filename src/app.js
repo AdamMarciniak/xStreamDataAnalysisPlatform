@@ -3,11 +3,17 @@ import * as Slider from './modules/Slider.js';
 import * as DataManager from './modules/DataManager.js';
 import * as Model from './modules/Model.js';
 import * as Simulation from './modules/Simulation.js';
+import * as Realtime from './modules/Realtime.js';
+const sensorConfig = require('../config/sensorConfig.json')
 
+
+DataManager.setupRealtimeData();
+
+console.log(sensorConfig['Body Sway'].max);
 
 const PADDING = 7;
 const PADDING_LEFT = 40;
-const NUM_OVERVIEW_POINTS = 2000;
+const NUM_OVERVIEW_POINTS = 1000;
 const NUM_FAKE_DATA_POINTS = 5000;
 const OVERVIEW_ROW_HEIGHT = 40;
 let startRatio = 0;
@@ -195,8 +201,76 @@ const drawOverviewCanvas = () => {
   overviewCanvasCtx.stroke();
 };
 
+
+const drawOverviewCanvasRealtime = (data) => {
+  const canvasMaxX = overviewCanvas.width;
+  const canvasMinX = 0
+  overviewCanvasCtx.strokeStyle = '#ff0000';
+  overviewCanvasCtx.lineWidth = 2;
+  overviewCanvasCtx.beginPath();
+  let propertyIndex = 0;
+  const keys = Object.keys(data);
+  const overViewCanvasYChunkSize = (overviewCanvas.height -
+    (keys.length + 1) * OVERVIEW_ROW_HEIGHT) / (keys.length);
+  let strokeS = 0;
+
+  overviewCanvasCtx.clearRect(0, 0, overviewCanvas.width, overviewCanvas.height);
+
+
+  const overviewScaledData = {};
+  
+  const reducedData = {};
+
+  
+
+  for (const key of keys) {
+
+    const sparseRatio = Math.max(1,Math.round(data[key].x.length/NUM_OVERVIEW_POINTS));
+    reducedData[key] = {'x': [0],'y':[0]};
+    for (let i = 0; i < data[key].x.length/sparseRatio; i++){
+      reducedData[key].x[i] = data[key].x[i * sparseRatio];
+      reducedData[key].y[i] = data[key].y[i * sparseRatio];
+    };
+
+    overviewCanvasCtx.strokeStyle = '#ff00' + strokeS + '0';
+    const overviewCanvasSliceMinY = overViewCanvasYChunkSize *
+      propertyIndex + OVERVIEW_ROW_HEIGHT * (propertyIndex + 1);
+    const overviewCanvasSliceMaxY = overViewCanvasYChunkSize *
+      (propertyIndex + 1) + OVERVIEW_ROW_HEIGHT * (propertyIndex + 1);
+
+    const xLength = reducedData[key].x.length;
+    overviewScaledData[key] = {'x':[], 'y': []};
+    reducedData[key].x.forEach((xVal) => {
+      const scaledX = scaleValues(xVal,
+                                  0,
+                                  reducedData[key].x[xLength-1],
+                                  canvasMinX,
+                                  canvasMaxX);
+      overviewScaledData[key]['x'].push(scaledX); 
+    })
+
+    reducedData[key].y.forEach((yVal) => {
+      const scaledY = scaleValues(yVal,
+                                  data[key].min,
+                                  data[key].max,
+                                  overviewCanvasSliceMinY,
+                                  overviewCanvasSliceMaxY);
+      overviewScaledData[key]['y'].push(scaledY);
+    })
+
+    overviewCanvasCtx.moveTo(overviewScaledData[key].x[0], overviewScaledData[key].y[0] );
+    for (let i = 0; i < overviewScaledData[key].x.length; i++){
+      overviewCanvasCtx.lineTo(Math.floor(overviewScaledData[key].x[i]) + 0.5,
+                               Math.floor(overviewScaledData[key].y[i]) + 0.5);
+    }
+
+    propertyIndex += 1;
+
+  };
+  overviewCanvasCtx.stroke();
+};
+
 const updateCanvases = (startRatio, endRatio, seekerPositionRatio) => {
-  drawOverviewCanvas();
 
 
   let seekerToWindowRatio = 0;
@@ -205,45 +279,45 @@ const updateCanvases = (startRatio, endRatio, seekerPositionRatio) => {
   }
 
 
+    const data = DataManager.getRealtimeData();
+    Object.keys(data).forEach((key) => {
+      const canvas  = canvases[key];
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      const canvasMaxX = canvas.width;
+      const canvasMaxY = canvas.height - PADDING;
+      const canvasMinX = 4 * PADDING_LEFT;
+      const canvasMinY = PADDING;
+      const slicedData = [];
+      const start = Math.floor(data[key].x.length * startRatio);
+      const end = Math.floor(data[key].x.length * endRatio);
 
-  nonTimeProperties.forEach((property) => {
-    const canvas  = canvases[property];
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    const canvasMaxX = canvas.width;
-    const canvasMaxY = canvas.height - PADDING;
-    const canvasMinX = 4 * PADDING_LEFT;
-    const canvasMinY = PADDING;
-    const slicedData = [];
-    const start = Math.floor(data[property].length * startRatio);
-    const end = Math.floor(data[property].length * endRatio);
+      for (let i = start; i < end; i++){
+        slicedData[i-start] = data[property][i];
+      }
 
-    for (let i = start; i < end; i++){
-      slicedData[i-start] = data[property][i];
-    }
+      const scaledData = slicedData.map(([x, y]) => [
+        scaleValues(x, slicedData[0][0], slicedData[slicedData.length - 1][0], canvasMinX, canvasMaxX),
+        scaleValues(y, minsAndMaxes[property]['min'], minsAndMaxes[property]['max'], canvasMinY, canvasMaxY)
+      ]);
 
-    const scaledData = slicedData.map(([x, y]) => [
-      scaleValues(x, slicedData[0][0], slicedData[slicedData.length - 1][0], canvasMinX, canvasMaxX),
-      scaleValues(y, minsAndMaxes[property]['min'], minsAndMaxes[property]['max'], canvasMinY, canvasMaxY)
-    ]);
-
-    const seekerXPosition = seekerToWindowRatio * (canvasMaxX - canvasMinX) + PADDING_LEFT * 4;
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = '#ff8484';
-    ctx.beginPath();
-    ctx.moveTo(...scaledData[0]);
-    scaledData.slice(1).forEach(point => ctx.lineTo(...point));
-    ctx.stroke();
-
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = '#000000';
-    if (seekerToWindowRatio != 0){
+      const seekerXPosition = seekerToWindowRatio * (canvasMaxX - canvasMinX) + PADDING_LEFT * 4;
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#ff8484';
       ctx.beginPath();
-      ctx.moveTo(seekerXPosition, canvasMaxY);
-      ctx.lineTo(seekerXPosition, canvasMinY);
+      ctx.moveTo(...scaledData[0]);
+      scaledData.slice(1).forEach(point => ctx.lineTo(...point));
       ctx.stroke();
-    }
-  });
+
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = '#000000';
+      if (seekerToWindowRatio != 0){
+        ctx.beginPath();
+        ctx.moveTo(seekerXPosition, canvasMaxY);
+        ctx.lineTo(seekerXPosition, canvasMinY);
+        ctx.stroke();
+      }
+    });
 };
 
 window.addEventListener('resize', () => { 
@@ -253,7 +327,8 @@ window.addEventListener('resize', () => {
     canvases[property].height = canvases[property].parentNode.getBoundingClientRect().height * 4;
   });
   overviewCanvas.width = overviewCanvas.parentNode.getBoundingClientRect().width * 4 ;
-  drawOverviewCanvas();
+  //drawOverviewCanvas();
+  drawOverviewCanvasRealtime(DataManager.getRealtimeData());
   updateCanvases(startRatio, endRatio, seekerPositionRatio);
   Model.resizeCanvasToDisplaySize();
   Model.renderOnce();
@@ -347,6 +422,8 @@ Model.resizeCanvasToDisplaySize();
 const canvases = createCanvases(nonTimeProperties);
 updateCanvases(0.1, 1, 0);
 
+Realtime.startRealtimeGathering();
+
 let requestId = undefined;
 let oldTimestamp = 0;
 const sensorMax = 2120;
@@ -355,6 +432,8 @@ const sensorRange = sensorMax-sensorMin;
 const angleRange = Math.PI;
 const angleToSensorRatio = angleRange/sensorRange;
 let sensorAngle = 0;
+
+
 const simulate = (timestamp) => {
     if (oldTimestamp == 0) oldTimestamp = timestamp;
     const delta = (timestamp - oldTimestamp) * seekerSpeed;
@@ -370,6 +449,7 @@ const simulate = (timestamp) => {
     overviewSeeker.style.left = seekerPosition; 
     Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, xAngle, yAngle);
     updateCanvases(startRatio, endRatio, seekerPositionRatio);
+    drawOverviewCanvasRealtime(DataManager.getRealtimeData());
     oldTimestamp = timestamp;
     requestId = requestAnimationFrame(simulate);
     updateValueReadout(seekerData);
@@ -394,28 +474,8 @@ const pauseSimulation = () => {
 }
 
 
-const establishWebsockets = () => {
 
-  const ws = new WebSocket('ws://192.99.54.136:1024');
 
-  ws.onopen = function (event) {
-    ws.send('Web Client Connected');
-  };
-
-  ws.onmessage = function (event){
-    const message = event.data;
-    if (message[0] == 'x'){
-      xAngle = message.substring(1);
-    }
-    if (message[0] == 'y') {
-      yAngle = message.substring(1);
-    }
-
-  };
-
-}
-
-establishWebsockets();
 
 
 
