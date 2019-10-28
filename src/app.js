@@ -4,12 +4,11 @@ import * as DataManager from './modules/DataManager.js';
 import * as Model from './modules/Model.js';
 import * as Simulation from './modules/Simulation.js';
 import * as Realtime from './modules/Realtime.js';
-const sensorConfig = require('../config/sensorConfig.json')
+const sensorConfig = require('../config/sensorConfig.json');
 
 
 DataManager.setupRealtimeData();
 
-console.log(sensorConfig['Body Sway'].max);
 
 const PADDING = 7;
 const PADDING_LEFT = 40;
@@ -53,8 +52,8 @@ let playState = 0;
 
 const getDataUnderSeeker = (seekerIndex, data) => {
   const dataUnderSeeker = {};
-  nonTimeProperties.forEach((property) => {
-    dataUnderSeeker[property] = data[property][seekerIndex];
+  Object.keys(data).forEach((property) => {
+    dataUnderSeeker[property] = data[property].y[seekerIndex];
   });
   return dataUnderSeeker;
 }
@@ -123,9 +122,10 @@ const setupButtons = () => {
   });
 };
 
-const createCanvases = (nonTimeProperties) => {
+const createCanvases = (sensorConfig) => {
   const canvases = {};
-  nonTimeProperties.forEach((property) => {
+  const properties = Object.keys(sensorConfig);
+  properties.forEach((property) => {
     let liElement = document.createElement('li');
     const newCanvas = document.createElement('canvas');
     const graphInfo = document.createElement('div');
@@ -155,7 +155,7 @@ const createCanvases = (nonTimeProperties) => {
 const updateValueReadout = (seekerData) => {
   Object.keys(seekerData).forEach(function (property) {
     let valueReadout = document.getElementById(property + 'valueReadout');
-    valueReadout.innerText = (-seekerData[property][1] * 45).toFixed(5);
+    valueReadout.innerText = (-seekerData[property] * 45).toFixed(5);
   });
 
 }
@@ -239,29 +239,31 @@ const drawOverviewCanvasRealtime = (data) => {
       (propertyIndex + 1) + OVERVIEW_ROW_HEIGHT * (propertyIndex + 1);
 
     const xLength = reducedData[key].x.length;
-    overviewScaledData[key] = {'x':[], 'y': []};
-    reducedData[key].x.forEach((xVal) => {
-      const scaledX = scaleValues(xVal,
-                                  0,
-                                  reducedData[key].x[xLength-1],
-                                  canvasMinX,
-                                  canvasMaxX);
-      overviewScaledData[key]['x'].push(scaledX); 
-    })
 
-    reducedData[key].y.forEach((yVal) => {
-      const scaledY = scaleValues(yVal,
-                                  data[key].min,
-                                  data[key].max,
-                                  overviewCanvasSliceMinY,
-                                  overviewCanvasSliceMaxY);
-      overviewScaledData[key]['y'].push(scaledY);
-    })
+ 
+    overviewCanvasCtx.moveTo(scaleValues(reducedData[key].x[0],
+                                          0,
+                                          reducedData[key].x[xLength - 1],
+                                          canvasMinX,
+                                          canvasMaxX),
+      
+                                          overviewCanvas.height - scaleValues(reducedData[key].y[0],
+                                          data[key].min,
+                                          data[key].max,
+                                          overviewCanvasSliceMinY,
+                                          overviewCanvasSliceMaxY) );
+    for (let i = 0; i < xLength; i++){
+      overviewCanvasCtx.lineTo(Math.floor(scaleValues(reducedData[key].x[i],
+                                          0,
+                                          reducedData[key].x[xLength - 1],
+                                          canvasMinX,
+                                          canvasMaxX)) + 0.5,
 
-    overviewCanvasCtx.moveTo(overviewScaledData[key].x[0], overviewScaledData[key].y[0] );
-    for (let i = 0; i < overviewScaledData[key].x.length; i++){
-      overviewCanvasCtx.lineTo(Math.floor(overviewScaledData[key].x[i]) + 0.5,
-                               Math.floor(overviewScaledData[key].y[i]) + 0.5);
+                                          overviewCanvas.height - Math.floor(scaleValues(reducedData[key].y[i],
+                                          data[key].min,
+                                          data[key].max,
+                                          overviewCanvasSliceMinY,
+                                          overviewCanvasSliceMaxY)) + 0.5);
     }
 
     propertyIndex += 1;
@@ -278,7 +280,6 @@ const updateCanvases = (startRatio, endRatio, seekerPositionRatio) => {
     seekerToWindowRatio = (seekerPositionRatio - startRatio) / (endRatio - startRatio);
   }
 
-
     const data = DataManager.getRealtimeData();
     Object.keys(data).forEach((key) => {
       const canvas  = canvases[key];
@@ -288,25 +289,41 @@ const updateCanvases = (startRatio, endRatio, seekerPositionRatio) => {
       const canvasMaxY = canvas.height - PADDING;
       const canvasMinX = 4 * PADDING_LEFT;
       const canvasMinY = PADDING;
-      const slicedData = [];
       const start = Math.floor(data[key].x.length * startRatio);
       const end = Math.floor(data[key].x.length * endRatio);
-
-      for (let i = start; i < end; i++){
-        slicedData[i-start] = data[property][i];
-      }
-
-      const scaledData = slicedData.map(([x, y]) => [
-        scaleValues(x, slicedData[0][0], slicedData[slicedData.length - 1][0], canvasMinX, canvasMaxX),
-        scaleValues(y, minsAndMaxes[property]['min'], minsAndMaxes[property]['max'], canvasMinY, canvasMaxY)
-      ]);
-
+    
+    
       const seekerXPosition = seekerToWindowRatio * (canvasMaxX - canvasMinX) + PADDING_LEFT * 4;
       ctx.lineWidth = 4;
       ctx.strokeStyle = '#ff8484';
       ctx.beginPath();
-      ctx.moveTo(...scaledData[0]);
-      scaledData.slice(1).forEach(point => ctx.lineTo(...point));
+
+      ctx.moveTo(scaleValues(data[key].x[start],
+                  data[key].x[start],
+                  data[key].x[end - 1],
+                  canvasMinX,
+                  canvasMaxX),
+        
+                  canvas.height - scaleValues(data[key].y[start],
+                  data[key].min,
+                  data[key].max,
+                  canvasMinY,
+                  canvasMaxY));
+
+
+      for (let i = start; i < end; i++){
+        ctx.lineTo(scaleValues(data[key].x[i],
+                    data[key].x[start],
+                    data[key].x[end-1],
+                    canvasMinX,
+                    canvasMaxX),
+           
+                    canvas.height - scaleValues(data[key].y[i],
+                    data[key].min,
+                    data[key].max,
+                    canvasMinY,
+                    canvasMaxY));
+      }
       ctx.stroke();
 
       ctx.lineWidth = 5;
@@ -419,7 +436,7 @@ const minsAndMaxes = DataManager.getDataMinsAndMaxes(data);
 let overviewPoints = DataManager.convertToSparseData(data, NUM_OVERVIEW_POINTS);
 Model.loadAllGeometry();
 Model.resizeCanvasToDisplaySize();
-const canvases = createCanvases(nonTimeProperties);
+const canvases = createCanvases(sensorConfig);
 updateCanvases(0.1, 1, 0);
 
 Realtime.startRealtimeGathering();
@@ -441,13 +458,13 @@ const simulate = (timestamp) => {
     timePassedSincePlay += delta;
     timeIndex = Simulation.getClosestIndex((timePassedSincePlay  / 1000), timeArray) + pausedIndex;
     seekerPositionRatio = Math.min(0.99, timeIndex / timeArray.length);
-    const seekerData = getDataUnderSeeker(timeIndex, data);
-    const frontLeftSuspensionAngle = seekerData[nonTimeProperties[0]][1];
-    const frontRightSuspensionAngle = seekerData[nonTimeProperties[1]][1];
-    const bodySwayAngle = seekerData[nonTimeProperties[2]][1];
+    const seekerData = getDataUnderSeeker(timeIndex, DataManager.getRealtimeData());
+    //const frontLeftSuspensionAngle = seekerData[nonTimeProperties[0]][1];
+    //const frontRightSuspensionAngle = seekerData[nonTimeProperties[1]][1];
+    //const bodySwayAngle = seekerData[nonTimeProperties[2]][1];
     seekerPosition = seekerPositionRatio * (overviewWidth - 1);
     overviewSeeker.style.left = seekerPosition; 
-    Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, xAngle, yAngle);
+    //Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, xAngle, yAngle);
     updateCanvases(startRatio, endRatio, seekerPositionRatio);
     drawOverviewCanvasRealtime(DataManager.getRealtimeData());
     oldTimestamp = timestamp;

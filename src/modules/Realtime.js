@@ -6,8 +6,6 @@ export const startRealtimeGathering = () => {
   establishWebsockets();
 }
 
-
-
 let timeIndex = 0;
 const establishWebsockets = () => {
 
@@ -21,8 +19,11 @@ const establishWebsockets = () => {
     const message = event.data;
     if (message[0] == 'x') {
       const xAngle = message.substring(1);
-      
       DataManager.addToRealtimeData('Body Sway', timeIndex, xAngle);
+      DataManager.addToRealtimeData('Body Sway2', timeIndex, 2 * xAngle);
+      DataManager.addToRealtimeData('Body Sway3', timeIndex, 3 * xAngle);
+      DataManager.addToRealtimeData('Body Sway4', timeIndex, 4* Math.sin(xAngle));
+
       timeIndex += 0.1;
 
     }
