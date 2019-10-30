@@ -1,7 +1,7 @@
 # xStreamDataAnalysisPlatform
 
 
-![Interface Image](/img/interface.png)
+![Interface Image](interface.png)
 
 
 Data Analytics Platform for BCIT Racing Car. (In Progress)
