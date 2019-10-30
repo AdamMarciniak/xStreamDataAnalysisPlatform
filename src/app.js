@@ -4,23 +4,26 @@ import * as Model from './modules/Model';
 import * as Simulation from './modules/Simulation';
 import startRealtimeGathering from './modules/Realtime';
 
-
-Model.loadAllGeometry();
-
 const sensorConfig = require('../config/sensorConfig.json');
 
 const PADDING = 7;
 const PADDING_LEFT = 40;
 const NUM_OVERVIEW_POINTS = 1000;
 const OVERVIEW_ROW_HEIGHT = 40;
+
 let startRatio = 0;
 let endRatio = 1;
+let seekerPosition = 0;
+let seekerRatio = 0;
+let timeIndex = 0;
+let seekerPositionRatio = 0;
+let pausedIndex = 0;
+let seekerSpeed = 1;
+let playState = 0;
+let timePassedSincePlay = 0;
+let requestId;
+let oldTimestamp = 0;
 
-const stackElement = document.getElementById('stack');
-const ulElement = document.createElement('ul');
-stackElement.appendChild(ulElement);
-const sliderCanvas = document.createElement('canvas');
-sliderCanvas.setAttribute('id', 'sliderCanvas');
 const overviewCanvas = document.getElementById('graphOverview');
 const overviewCanvasCtx = overviewCanvas.getContext('2d');
 const playButton = document.getElementById('playButton');
@@ -29,6 +32,7 @@ const stopButton = document.getElementById('stopButton');
 const speedButton = document.getElementById('speedButton');
 const overviewSliderStart = document.getElementById('overviewSliderStart');
 const overviewSeeker = document.getElementById('overviewSeeker');
+
 
 const getElementWidth = (element) => {
   const elementRect = element.getBoundingClientRect();
@@ -43,52 +47,43 @@ const getDataUnderSeeker = (seekerIndex, data) => {
   return dataUnderSeeker;
 };
 
-let seekerPosition = 0;
-let seekerRatio = 0;
-let timeIndex = 0;
-let seekerPositionRatio = 0;
-let pausedIndex = 0;
-let seekerSpeed = 1;
-let playState = 0;
-let timePassedSincePlay = 0;
-let requestId;
-let oldTimestamp = 0;
-
 const scaleValues = (input, inMin, inMax, outMin, outMax) => outMin
  + ((input - inMin) / (inMax - inMin)) * (outMax - outMin);
 
-const createCanvases = () => {
+
+const setOverviewDimensions = () => {
+  const liElement = document.querySelector('.sensorItem');
+  overviewCanvas.width = liElement.getBoundingClientRect().width * 4 - 4 * PADDING_LEFT;
+  overviewCanvas.height = liElement.getBoundingClientRect().height * 4;
+};
+
+const createCanvasesFromConfig = (config) => {
   const canvases = {};
-  const properties = Object.keys(sensorConfig);
-  properties.forEach((property) => {
-    const liElement = document.createElement('li');
-    const newCanvas = document.createElement('canvas');
-    const graphInfo = document.createElement('div');
-    const graphTitle = document.createElement('h3');
-    const valueReadout = document.createElement('h4');
-    valueReadout.setAttribute('class', 'valueReadout');
-    valueReadout.setAttribute('id', `${property}valueReadout`);
-    graphInfo.setAttribute('class', 'graphInfo');
-    newCanvas.setAttribute('id', property);
-    graphTitle.innerText = property.toUpperCase();
-    valueReadout.innerText = '0';
-    canvases[property] = newCanvas;
-    graphInfo.appendChild(graphTitle);
-    graphInfo.appendChild(valueReadout);
-    liElement.appendChild(graphInfo);
-    liElement.appendChild(canvases[property]);
-    ulElement.appendChild(liElement);
-    overviewCanvas.width = liElement.getBoundingClientRect().width * 4 - 4 * PADDING_LEFT;
-    overviewCanvas.height = liElement.getBoundingClientRect().height * 4;
-    canvases[property].width = canvases[property].parentNode.getBoundingClientRect().width * 4;
-    canvases[property].height = canvases[property].parentNode.getBoundingClientRect().height * 4;
+  Object.keys(config).forEach((property) => {
+    const template = document.querySelector('#sensorInfo');
+    const sensorList = document.querySelector('#sensorList');
+    const clone = document.importNode(template.content, true);
+    const h3 = clone.querySelector('h3');
+    const h4 = clone.querySelector('h4');
+    const canvas = clone.querySelector('canvas');
+    h3.textContent = property;
+    h4.id = `${property}valueReadout`;
+    canvas.id = property;
+    sensorList.appendChild(clone);
+    canvas.width = canvas.parentNode.getBoundingClientRect().width * 4;
+    canvas.height = canvas.parentNode.getBoundingClientRect().height * 4;
+    canvases[property] = canvas;
   });
   return canvases;
 };
 
+const canvases = createCanvasesFromConfig(sensorConfig);
+Model.loadAllGeometry();
 Model.resizeCanvasToDisplaySize();
-const canvases = createCanvases(sensorConfig);
+setOverviewDimensions();
 startRealtimeGathering();
+
+
 
 const updateValueReadout = (seekerData) => {
   Object.keys(seekerData).forEach((property) => {
@@ -97,11 +92,17 @@ const updateValueReadout = (seekerData) => {
   });
 };
 
+
+const setDefaultCanvasStyles = (ctx) => {
+  ctx.strokeStyle = '#ff0000';
+  ctx.lineWidth = 2;
+};
+
+setDefaultCanvasStyles(overviewCanvasCtx);
+
 const drawOverviewCanvasRealtime = (data) => {
   const canvasMaxX = overviewCanvas.width;
   const canvasMinX = 0;
-  overviewCanvasCtx.strokeStyle = '#ff0000';
-  overviewCanvasCtx.lineWidth = 2;
   overviewCanvasCtx.beginPath();
   let propertyIndex = 0;
   const keys = Object.keys(data);
@@ -119,7 +120,6 @@ const drawOverviewCanvasRealtime = (data) => {
       reducedData[key].y[i] = data[key].y[i * sparseRatio];
     }
 
-    overviewCanvasCtx.strokeStyle = '#ff0000';
     const overviewCanvasSliceMinY = overViewCanvasYChunkSize
       * propertyIndex + OVERVIEW_ROW_HEIGHT * (propertyIndex + 1);
     const overviewCanvasSliceMaxY = overViewCanvasYChunkSize
@@ -193,7 +193,6 @@ const updateCanvases = (arrayStartRatio, arrayEndRatio, seekerRatio) => {
       data[key].max,
       canvasMinY,
       canvasMaxY));
-
 
     for (let i = start; i < end; i += 1) {
       ctx.lineTo(scaleValues(data[key].x[i],
