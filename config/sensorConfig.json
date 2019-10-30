@@ -1,0 +1,25 @@
+{
+  "Body Sway" : {
+    "description": "Angular data from accelerometer mounted on frame body in X direction.",
+    "min": -4,
+    "max": 4
+  },
+  "Body Sway2": {
+    "description": "Angular data from accelerometer mounted on frame body in X direction.",
+    "min": -8,
+    "max": 8
+  },
+  "Body Sway3": {
+    "description": "Angular data from accelerometer mounted on frame body in X direction.",
+    "min": -12,
+    "max": 12
+  },
+  "Body Sway4": {
+    "description": "Angular data from accelerometer mounted on frame body in X direction.",
+    "min": -4,
+    "max": 4
+  }
+
+}
+
+
