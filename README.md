@@ -1,25 +1,26 @@
 # xStreamDataAnalysisPlatform
 
 
-![Interface Image](/img/interface.png)
+![Interface Image](interface.png)
 
 
-Data Analytics Platform for BCIT Racing Car. (In Progress)
+Data Analytics Platform for BCIT Racing Car. (In Development)
 
 Check out a live demo here! 
 [http://adam.teaches.engineering](http://adam.teaches.engineering)
 
+This tool works in tandem with an ESP32 module that gathers data from an offroad buggy.
+The ESP32 gathers data such as stress in frame members, suspension angles, RPM readings, car tilt, engine heat, and GPS position. The ESP32 then sends this data using websockets periodically (default every 100ms) to the Node server.
+The Node server sends this data to all connected clients on the demo site.
+
 Core Features:
+ - Realtime data capture and viewing using websockets. (See realtime data from anywhere while car is running)
  - Scrub through data easily and quickly.
- - Move suspension links in 3D model based on imported real world sensor data.
+ - Suspension links and car in 3D model move based on realtime or imported real world sensor data.
  - Change color of specific frame members based on stress data experienced.
- - Play button to review real time run through of data.
+ - Play, pause, stop to navigate through data.
+ - Speed settings to replay data.
+ - See live location data of car on the track.
  
- 
-Usage:
- - Download Node Package Manager.
- - In CMD prompt paste: "npm install http-server -g"
- - Navigate to the main directory of this folderin command prompt.
- - Type "http-server"
- - Go to the IP address http-server has given you and it will run in your browser.
+During a Baja car test or race when the data aquisition module is on, go to the demo website to see realtime data.
  
