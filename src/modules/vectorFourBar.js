@@ -285,7 +285,7 @@ class VectorFourBar{
             ||typeof(this.linkage.ground) !== 'number'
             ||typeof(this.linkage.thetaTwo) !== 'number'
         ){
-            console.log('Incorrect Parameter Type');
+            ('Incorrect Parameter Type');
             return false;
         }else {
             return true;

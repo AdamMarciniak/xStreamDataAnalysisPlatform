@@ -40,7 +40,6 @@ const parts = {};
 
 partNames.forEach((name) => {
   parts[name] = new THREE.Mesh();
-  console.log(parts);
 });
 
 const loader = new STLLoader();

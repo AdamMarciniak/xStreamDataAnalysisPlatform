@@ -83,8 +83,6 @@ Model.resizeCanvasToDisplaySize();
 setOverviewDimensions();
 startRealtimeGathering();
 
-
-
 const updateValueReadout = (seekerData) => {
   Object.keys(seekerData).forEach((property) => {
     const valueReadout = document.getElementById(`${property}valueReadout`);
@@ -159,13 +157,12 @@ const drawOverviewCanvasRealtime = (data) => {
   overviewCanvasCtx.stroke();
 };
 
-const updateCanvases = (arrayStartRatio, arrayEndRatio, seekerRatio) => {
+const updateCanvases = (arrayStartRatio, arrayEndRatio, seekerRatio, data) => {
   let seekerToWindowRatio = 0;
   if (seekerRatio > arrayStartRatio && seekerRatio < arrayEndRatio) {
     seekerToWindowRatio = (seekerRatio - arrayStartRatio) / (arrayEndRatio - arrayStartRatio);
   }
 
-  const data = DataManager.getRealtimeData();
   Object.keys(data).forEach((key) => {
     const canvas = canvases[key];
     const ctx = canvas.getContext('2d');
@@ -219,10 +216,11 @@ const updateCanvases = (arrayStartRatio, arrayEndRatio, seekerRatio) => {
     }
   });
 };
-updateCanvases(0.1, 1, 0);
+updateCanvases(0.1, 1, 0, DataManager.getRealtimeData());
 
-
+let i = 0;
 const startSimulation = (timestamp) => {
+  i += 1;
   if (oldTimestamp === 0) oldTimestamp = timestamp;
   const delta = (timestamp - oldTimestamp) * seekerSpeed;
   const overviewWidth = getElementWidth(overviewCanvas);
@@ -238,10 +236,14 @@ const startSimulation = (timestamp) => {
   seekerPosition = seekerPositionRatio * (overviewWidth - 1);
   seekerPosition = 0;
   overviewSeeker.style.left = seekerPosition;
+  if (frontLeftSuspensionAngle === 0) {
+    Model.animate(Math.sin(i / 5), Math.sin(i / 5), bodySwayAngle);
+  } else {
+    Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, bodySwayAngle);
+  }
 
-  Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, bodySwayAngle);
   seekerPositionRatio = 0;
-  updateCanvases(startRatio, endRatio, seekerPositionRatio);
+  updateCanvases(startRatio, endRatio, seekerPositionRatio, DataManager.getRealtimeData());
   drawOverviewCanvasRealtime(DataManager.getRealtimeData());
   oldTimestamp = timestamp;
   requestId = requestAnimationFrame(startSimulation);
@@ -258,7 +260,7 @@ const stopSimulation = () => {
   cancelAnimationFrame(requestId);
   overviewSeeker.style.left = 0;
   overviewSeeker.style.left = 0;
-  updateCanvases(startRatio, endRatio, seekerPositionRatio);
+  updateCanvases(startRatio, endRatio, seekerPositionRatio, DataManager.getRealtimeData());
   pausedIndex = 0;
 };
 
@@ -320,7 +322,7 @@ window.addEventListener('resize', () => {
   });
   overviewCanvas.width = overviewCanvas.parentNode.getBoundingClientRect().width * 4;
   drawOverviewCanvasRealtime(DataManager.getRealtimeData());
-  updateCanvases(startRatio, endRatio, seekerPositionRatio);
+  updateCanvases(startRatio, endRatio, seekerPositionRatio, DataManager.getRealtimeData());
   Model.resizeCanvasToDisplaySize();
   Model.renderOnce();
   const overviewRect = overviewCanvas.getBoundingClientRect();
@@ -356,7 +358,7 @@ const makeEdgePositioner = ((elementToMove, originalY, originalZoom) => (event) 
   endRatio = Math.min(1, 1 - (overviewRect.right - sliderRect.right)
   / (overviewRect.right - overviewRect.left));
 
-  updateCanvases(startRatio, endRatio, seekerPositionRatio);
+  updateCanvases(startRatio, endRatio, seekerPositionRatio, DataManager.getRealtimeData());
 });
 
 
