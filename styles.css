@@ -113,8 +113,6 @@ button:focus {
     right: -17px;
 }
 
-
-
 .overviewWrapper {
     position: relative;
     margin-left: 40px;
@@ -231,6 +229,8 @@ canvas {
     z-index:20;
     top: 0px;
     height: 75px;
+    left: 40px;
+    bottom: 0;
 }
 
 li {

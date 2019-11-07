@@ -2,11 +2,13 @@ import * as Slider from './modules/Slider';
 import * as DataManager from './modules/DataManager';
 import * as Model from './modules/Model';
 import * as Simulation from './modules/Simulation';
+import * as DataVisualizer from './modules/DataVisualizer';
+import { scaleValues } from './modules/Utils';
 import startRealtimeGathering from './modules/Realtime';
 
 const sensorConfig = require('../config/sensorConfig.json');
 
-const PADDING = 7;
+const PADDING = 10;
 const PADDING_LEFT = 40;
 const NUM_OVERVIEW_POINTS = 1000;
 const OVERVIEW_ROW_HEIGHT = 40;
@@ -47,49 +49,21 @@ const getDataUnderSeeker = (seekerIndex, data) => {
   return dataUnderSeeker;
 };
 
-const scaleValues = (input, inMin, inMax, outMin, outMax) => outMin
- + ((input - inMin) / (inMax - inMin)) * (outMax - outMin);
-
-
 const setOverviewDimensions = () => {
-  const liElement = document.querySelector('.sensorItem');
-  overviewCanvas.width = liElement.getBoundingClientRect().width * 4 - 4 * PADDING_LEFT;
-  overviewCanvas.height = liElement.getBoundingClientRect().height * 4;
+  const [sWidth, sHeight] = DataVisualizer.getCanvasStyleRect();
+  overviewCanvas.style.width = sWidth;
+  overviewCanvas.style.height = sHeight;
+
+  const [width, height] = DataVisualizer.getCanvasRect();
+  overviewCanvas.width = width;
+  overviewCanvas.height = height;
 };
 
-const createCanvasesFromConfig = (config) => {
-  const canvases = {};
-  Object.keys(config).forEach((property) => {
-    const template = document.querySelector('#sensorInfo');
-    const sensorList = document.querySelector('#sensorList');
-    const clone = document.importNode(template.content, true);
-    const h3 = clone.querySelector('h3');
-    const h4 = clone.querySelector('h4');
-    const canvas = clone.querySelector('canvas');
-    h3.textContent = property;
-    h4.id = `${property}valueReadout`;
-    canvas.id = property;
-    sensorList.appendChild(clone);
-    canvas.width = canvas.parentNode.getBoundingClientRect().width * 4;
-    canvas.height = canvas.parentNode.getBoundingClientRect().height * 4;
-    canvases[property] = canvas;
-  });
-  return canvases;
-};
-
-const canvases = createCanvasesFromConfig(sensorConfig);
+DataVisualizer.createDataVisualizers(sensorConfig);
 Model.loadAllGeometry();
 Model.resizeCanvasToDisplaySize();
 setOverviewDimensions();
 startRealtimeGathering();
-
-const updateValueReadout = (seekerData) => {
-  Object.keys(seekerData).forEach((property) => {
-    const valueReadout = document.getElementById(`${property}valueReadout`);
-    valueReadout.innerText = (-seekerData[property] * 45).toFixed(5);
-  });
-};
-
 
 const setDefaultCanvasStyles = (ctx) => {
   ctx.strokeStyle = '#ff0000';
@@ -157,69 +131,11 @@ const drawOverviewCanvasRealtime = (data) => {
   overviewCanvasCtx.stroke();
 };
 
-const updateCanvases = (arrayStartRatio, arrayEndRatio, seekerRatio, data) => {
-  let seekerToWindowRatio = 0;
-  if (seekerRatio > arrayStartRatio && seekerRatio < arrayEndRatio) {
-    seekerToWindowRatio = (seekerRatio - arrayStartRatio) / (arrayEndRatio - arrayStartRatio);
-  }
 
-  Object.keys(data).forEach((key) => {
-    const canvas = canvases[key];
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const canvasMaxX = canvas.width;
-    const canvasMaxY = canvas.height - PADDING;
-    const canvasMinX = 4 * PADDING_LEFT;
-    const canvasMinY = PADDING;
-    const start = Math.floor(data[key].x.length * arrayStartRatio);
-    const end = Math.floor(data[key].x.length * arrayEndRatio);
-
-    const seekerXPosition = seekerToWindowRatio * (canvasMaxX - canvasMinX) + PADDING_LEFT * 4;
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = '#ff8484';
-    ctx.beginPath();
-
-    ctx.moveTo(scaleValues(data[key].x[start],
-      data[key].x[start],
-      data[key].x[end - 1],
-      canvasMinX,
-      canvasMaxX),
-
-    canvas.height - scaleValues(data[key].y[start],
-      data[key].min,
-      data[key].max,
-      canvasMinY,
-      canvasMaxY));
-
-    for (let i = start; i < end; i += 1) {
-      ctx.lineTo(scaleValues(data[key].x[i],
-        data[key].x[start],
-        data[key].x[end - 1],
-        canvasMinX,
-        canvasMaxX),
-
-      canvas.height - scaleValues(data[key].y[i],
-        data[key].min,
-        data[key].max,
-        canvasMinY,
-        canvasMaxY));
-    }
-    ctx.stroke();
-
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = '#000000';
-    if (seekerToWindowRatio !== 0) {
-      ctx.beginPath();
-      ctx.moveTo(seekerXPosition, canvasMaxY);
-      ctx.lineTo(seekerXPosition, canvasMinY);
-      ctx.stroke();
-    }
-  });
-};
-updateCanvases(0.1, 1, 0, DataManager.getRealtimeData());
+DataVisualizer.updatedataVisualizers(0.1, 1, 0, DataManager.getRealtimeData());
 
 let i = 0;
-const startSimulation = (timestamp) => {
+const simulate = (timestamp) => {
   i += 1;
   if (oldTimestamp === 0) oldTimestamp = timestamp;
   const delta = (timestamp - oldTimestamp) * seekerSpeed;
@@ -228,8 +144,6 @@ const startSimulation = (timestamp) => {
   const timeArray = DataManager.getRealtimeData()['Body Sway'].x;
   timeIndex = Simulation.getClosestIndex((timePassedSincePlay / 1000), timeArray) + pausedIndex;
   seekerPositionRatio = Math.min(0.99, timeIndex / timeArray.length);
-  const seekerData = getDataUnderSeeker(timeIndex, DataManager.getRealtimeData());
-
   const frontLeftSuspensionAngle = DataManager.getLatestYValue('Body Sway');
   const frontRightSuspensionAngle = DataManager.getLatestYValue('Body Sway2');
   const bodySwayAngle = DataManager.getLatestYValue('Body Sway3');
@@ -241,13 +155,16 @@ const startSimulation = (timestamp) => {
   } else {
     Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, bodySwayAngle);
   }
-
   seekerPositionRatio = 0;
-  updateCanvases(startRatio, endRatio, seekerPositionRatio, DataManager.getRealtimeData());
+
+  DataVisualizer.updatedataVisualizers(startRatio,
+    endRatio,
+    seekerPositionRatio,
+    DataManager.getRealtimeData());
+
   drawOverviewCanvasRealtime(DataManager.getRealtimeData());
   oldTimestamp = timestamp;
-  requestId = requestAnimationFrame(startSimulation);
-  updateValueReadout(seekerData);
+  requestId = requestAnimationFrame(simulate);
 };
 
 const pauseSimulation = () => {
@@ -260,7 +177,12 @@ const stopSimulation = () => {
   cancelAnimationFrame(requestId);
   overviewSeeker.style.left = 0;
   overviewSeeker.style.left = 0;
-  updateCanvases(startRatio, endRatio, seekerPositionRatio, DataManager.getRealtimeData());
+
+  DataVisualizer.updatedataVisualizers(startRatio,
+    endRatio,
+    seekerPositionRatio,
+    DataManager.getRealtimeData());
+
   pausedIndex = 0;
 };
 
@@ -296,7 +218,7 @@ const setupButtons = () => {
       playButton.className = 'activeButton';
       playState = 1;
       pauseButton.classList.remove('activeButton');
-      requestAnimationFrame(startSimulation);
+      requestAnimationFrame(simulate);
     }
   });
 
@@ -315,14 +237,17 @@ const setupButtons = () => {
 setupButtons();
 
 window.addEventListener('resize', () => {
+  DataVisualizer.scaleCanvases();
   Model.resizeCanvasToDisplaySize();
-  Object.keys(canvases).forEach((property) => {
-    canvases[property].width = canvases[property].parentNode.getBoundingClientRect().width * 4;
-    canvases[property].height = canvases[property].parentNode.getBoundingClientRect().height * 4;
-  });
+  setOverviewDimensions();
   overviewCanvas.width = overviewCanvas.parentNode.getBoundingClientRect().width * 4;
   drawOverviewCanvasRealtime(DataManager.getRealtimeData());
-  updateCanvases(startRatio, endRatio, seekerPositionRatio, DataManager.getRealtimeData());
+
+  DataVisualizer.updatedataVisualizers(startRatio,
+    endRatio,
+    seekerPositionRatio,
+    DataManager.getRealtimeData());
+
   Model.resizeCanvasToDisplaySize();
   Model.renderOnce();
   const overviewRect = overviewCanvas.getBoundingClientRect();
@@ -358,7 +283,10 @@ const makeEdgePositioner = ((elementToMove, originalY, originalZoom) => (event) 
   endRatio = Math.min(1, 1 - (overviewRect.right - sliderRect.right)
   / (overviewRect.right - overviewRect.left));
 
-  updateCanvases(startRatio, endRatio, seekerPositionRatio, DataManager.getRealtimeData());
+  DataVisualizer.updatedataVisualizers(startRatio,
+    endRatio,
+    seekerPositionRatio,
+    DataManager.getRealtimeData());
 });
 
 

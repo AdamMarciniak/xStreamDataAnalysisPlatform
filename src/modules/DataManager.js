@@ -19,7 +19,6 @@ export const setupRealtimeData = () => {
 export const addToRealtimeData = (sensor, xVal, yVal) => {
   realtimeData[sensor].x.push(xVal);
   realtimeData[sensor].y.push(yVal);
-  console.log(` Data Length = ${realtimeData[sensor].x.length}`);
 };
 
 export const getRealtimeData = () => (realtimeData);
