@@ -1,3 +1,5 @@
 node_modules
 *.sh
 dist/bundle.js
+deploy.sh
+dist/bundle.js
