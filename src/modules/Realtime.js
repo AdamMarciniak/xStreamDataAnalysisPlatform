@@ -8,8 +8,8 @@ let realtimeFlag = 0;
 export const getRealtimeFlag = () => realtimeFlag;
 
 const addChangedData = (index, timeIndex, data) => {
-  DataManager.addToRealtimeData(index, timeIndex, Math.sin(data * 10)
-    + 0.9 * Math.sin(3.14159 * Math.random()));
+  DataManager.addToRealtimeData(index, timeIndex, 3.5 * Math.sin(data * 10)
+    + 0.3 * Math.random() * Math.sin(data * 100));
 };
 
 let timeIndex = 0;

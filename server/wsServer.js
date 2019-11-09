@@ -5,7 +5,7 @@ console.log('Running WSS server');
 
 let i = 0;
 const outputValues = (() => {
-  i += 0.005;
+  i += 0.0005;
   wss.clients.forEach((client) => {
     client.send(`0${i}`);
     client.send(`1${i}`);
