@@ -1,9 +1,16 @@
 
 import * as DataManager from './DataManager';
 
+const sensorConfig = require('../../config/sensorConfig.json');
+
 let realtimeFlag = 0;
 
 export const getRealtimeFlag = () => realtimeFlag;
+
+const addChangedData = (index, timeIndex, data) => {
+  DataManager.addToRealtimeData(index, timeIndex, Math.sin(data * 10)
+    + 0.9 * Math.sin(3.14159 * Math.random()));
+};
 
 let timeIndex = 0;
 const establishWebsockets = () => {
@@ -16,19 +23,12 @@ const establishWebsockets = () => {
   ws.onclose = function onClose(event) {
     realtimeFlag = 0;
   };
-
   ws.onmessage = function onMessage(event) {
     realtimeFlag = 1;
     const message = event.data;
-    if (message[0] === 'x') {
-      const xAngle = parseFloat(message.substring(1));
-      DataManager.addToRealtimeData('Body Sway', timeIndex, xAngle);
-      DataManager.addToRealtimeData('Body Sway2', timeIndex, 2 * xAngle);
-      DataManager.addToRealtimeData('Body Sway3', timeIndex, 3 * xAngle);
-      DataManager.addToRealtimeData('Body Sway4', timeIndex, 4 * Math.sin(xAngle));
-
-      timeIndex += 0.1;
-    }
+    const xAngle = parseFloat(message.substring(1));
+    addChangedData(message[0], timeIndex, xAngle);
+    timeIndex += 0.016;
   };
 };
 

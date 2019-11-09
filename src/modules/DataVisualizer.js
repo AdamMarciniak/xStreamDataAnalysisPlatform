@@ -48,13 +48,13 @@ export const getCanvasRect = () => {
 
 const createDataVisualizer = (title) => {
   const visualizer = document.importNode(templateContent, true).children[0];
-  getTitleElement(visualizer).innerText = title;
+  getTitleElement(visualizer).innerText = title.toUpperCase();
   return visualizer;
 };
 
 export const createDataVisualizers = (config) => {
   Object.keys(config).forEach((property) => {
-    const visualizer = createDataVisualizer(property);
+    const visualizer = createDataVisualizer(config[property].title);
     dataVisualizers[property] = visualizer;
     vislualizerListElement.appendChild(dataVisualizers[property]);
   });
@@ -64,7 +64,7 @@ export const createDataVisualizers = (config) => {
 export const getListItemRect = () => listItemRect;
 
 
-export const updatedataVisualizers = (arrayStartRatio, arrayEndRatio, seekerRatio, data) => {
+export const updatedataVisualizers = (arrayStartRatio, arrayEndRatio, seekerRatio, data, dataLength) => {
   let seekerToWindowRatio = 0;
   if (seekerRatio > arrayStartRatio && seekerRatio < arrayEndRatio) {
     seekerToWindowRatio = (seekerRatio - arrayStartRatio) / (arrayEndRatio - arrayStartRatio);
@@ -77,8 +77,8 @@ export const updatedataVisualizers = (arrayStartRatio, arrayEndRatio, seekerRati
     const canvasMaxY = canvas.height - PADDING;
     const canvasMinX = 0;
     const canvasMinY = PADDING;
-    const start = Math.floor(data[key].x.length * arrayStartRatio);
-    const end = Math.floor(data[key].x.length * arrayEndRatio);
+    const start = Math.floor(dataLength * arrayStartRatio);
+    const end = Math.floor(dataLength * arrayEndRatio);
 
     const seekerXPosition = seekerToWindowRatio * (canvasMaxX - canvasMinX) + PADDING_LEFT * 4;
     ctx.lineWidth = 4;
@@ -97,7 +97,16 @@ export const updatedataVisualizers = (arrayStartRatio, arrayEndRatio, seekerRati
       canvasMinY,
       canvasMaxY));
 
-    for (let i = start; i < end; i += 1) {
+    let interval = 1;
+    if ((end - start) > 8000) {
+      interval = 20;
+    } else if ((end - start) > 4000) {
+      interval = 10;
+    } else if ((end - start) > 2000) {
+      interval = 4;
+    }
+
+    for (let i = start; i < end; i += interval) {
       ctx.lineTo(scaleValues(data[key].x[i],
         data[key].x[start],
         data[key].x[end - 1],
@@ -110,6 +119,13 @@ export const updatedataVisualizers = (arrayStartRatio, arrayEndRatio, seekerRati
         canvasMinY,
         canvasMaxY));
     }
+    ctx.stroke();
+
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#d9d9d9';
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2, 0);
+    ctx.lineTo(canvas.width / 2, canvas.height);
     ctx.stroke();
 
     ctx.lineWidth = 5;

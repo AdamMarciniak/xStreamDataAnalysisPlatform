@@ -180,8 +180,7 @@ export const loadAllGeometry = () => {
   });
 };
 
-export const animate = (left, right, body) => {
-  masterGroup.rotation.x = -body * 0.05;
+export const animate = (left, right) => {
   armTopKnuckleGroupLeft.rotation.x = left * 0.1;
   armTopKnuckleGroupRight.rotation.x = right * 0.1;
 

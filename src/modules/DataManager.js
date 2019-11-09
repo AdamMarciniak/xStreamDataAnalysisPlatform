@@ -16,6 +16,9 @@ export const setupRealtimeData = () => {
   });
 };
 
+export const getDataLength = () => realtimeData[Object.keys(realtimeData)[0]].y.length;
+
+
 export const addToRealtimeData = (sensor, xVal, yVal) => {
   realtimeData[sensor].x.push(xVal);
   realtimeData[sensor].y.push(yVal);
@@ -24,6 +27,7 @@ export const addToRealtimeData = (sensor, xVal, yVal) => {
 export const getRealtimeData = () => (realtimeData);
 
 export const getLatestYValue = (key) => realtimeData[key].y[realtimeData[key].y.length - 1];
+
 
 const createFakeRawData = (nonTimeProperties, numDataPoints) => {
   const timeArray = [];
@@ -74,8 +78,7 @@ export const convertToSparseData = (allPropertyPoints, numPoints) => {
       for (let i = 0; i < allPropertyPoints[key].length / (includeEveryNth); i += 1) {
         reducedPoints[key][i] = allPropertyPoints[key][i * includeEveryNth];
       }
-    }
-    else {
+    } else {
       reducedPoints[key] = allPropertyPoints[key];
     }
   });

@@ -1,25 +1,52 @@
 {
-  "Body Sway" : {
+  "0" : {
+    "title": "Left Suspension Angle",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
     "min": -4,
     "max": 4
   },
-  "Body Sway2": {
+  "1": {
+    "title": "Left Suspension Angle2",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -8,
-    "max": 8
+    "min": -4,
+    "max": 4
   },
-  "Body Sway3": {
+  "2": {
+    "title": "Left Suspension Angle3",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -12,
-    "max": 12
+    "min": -4,
+    "max": 4
   },
-  "Body Sway4": {
+  "3": {
+    "title": "Left Suspension Angle4",
+    "description": "Angular data from accelerometer mounted on frame body in X direction.",
+    "min": -4,
+    "max": 4
+  },
+  "4": {
+    "title": "Left Suspension Angle5",
+    "description": "Angular data from accelerometer mounted on frame body in X direction.",
+    "min": -4,
+    "max": 4
+  },
+  "5": {
+    "title": "Left Suspension Angle6",
+    "description": "Angular data from accelerometer mounted on frame body in X direction.",
+    "min": -4,
+    "max": 4
+  },
+  "6": {
+    "title": "Left Suspension Angle7",
+    "description": "Angular data from accelerometer mounted on frame body in X direction.",
+    "min": -4,
+    "max": 4
+  },
+  "7": {
+    "title": "Left Suspension Angle8",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
     "min": -4,
     "max": 4
   }
-
 }
 
 

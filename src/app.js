@@ -11,8 +11,11 @@ const sensorConfig = require('../config/sensorConfig.json');
 const PADDING = 10;
 const PADDING_LEFT = 40;
 const NUM_OVERVIEW_POINTS = 1000;
-const OVERVIEW_ROW_HEIGHT = 40;
+const OVERVIEW_ROW_HEIGHT = 4;
 
+let pausedDataLength = null;
+
+let pausedFlag = false;
 let startRatio = 0;
 let endRatio = 1;
 let seekerPosition = 0;
@@ -52,11 +55,11 @@ const getDataUnderSeeker = (seekerIndex, data) => {
 const setOverviewDimensions = () => {
   const [sWidth, sHeight] = DataVisualizer.getCanvasStyleRect();
   overviewCanvas.style.width = sWidth;
-  overviewCanvas.style.height = sHeight;
+  overviewCanvas.style.height = sHeight * 2;
 
   const [width, height] = DataVisualizer.getCanvasRect();
   overviewCanvas.width = width;
-  overviewCanvas.height = height;
+  overviewCanvas.height = height * 2;
 };
 
 DataVisualizer.createDataVisualizers(sensorConfig);
@@ -131,36 +134,36 @@ const drawOverviewCanvasRealtime = (data) => {
   overviewCanvasCtx.stroke();
 };
 
-
-DataVisualizer.updatedataVisualizers(0.1, 1, 0, DataManager.getRealtimeData());
+DataVisualizer.updatedataVisualizers(0.1, 1, 0, DataManager.getRealtimeData(), DataManager.getDataLength());
 
 let i = 0;
 const simulate = (timestamp) => {
   i += 1;
+  pausedFlag = false;
   if (oldTimestamp === 0) oldTimestamp = timestamp;
   const delta = (timestamp - oldTimestamp) * seekerSpeed;
   const overviewWidth = getElementWidth(overviewCanvas);
   timePassedSincePlay += delta;
-  const timeArray = DataManager.getRealtimeData()['Body Sway'].x;
+  const timeArray = DataManager.getRealtimeData()['0'].x;
   timeIndex = Simulation.getClosestIndex((timePassedSincePlay / 1000), timeArray) + pausedIndex;
   seekerPositionRatio = Math.min(0.99, timeIndex / timeArray.length);
-  const frontLeftSuspensionAngle = DataManager.getLatestYValue('Body Sway');
-  const frontRightSuspensionAngle = DataManager.getLatestYValue('Body Sway2');
-  const bodySwayAngle = DataManager.getLatestYValue('Body Sway3');
+  const frontLeftSuspensionAngle = DataManager.getLatestYValue(1);
+  const frontRightSuspensionAngle = DataManager.getLatestYValue('1');
   seekerPosition = seekerPositionRatio * (overviewWidth - 1);
   seekerPosition = 0;
   overviewSeeker.style.left = seekerPosition;
   if (frontLeftSuspensionAngle === 0) {
-    Model.animate(Math.sin(i / 5), Math.sin(i / 5), bodySwayAngle);
+    Model.animate(Math.sin(i / 5), Math.sin(i / 5));
   } else {
-    Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle, bodySwayAngle);
+    Model.animate(frontLeftSuspensionAngle, frontRightSuspensionAngle);
   }
   seekerPositionRatio = 0;
 
   DataVisualizer.updatedataVisualizers(startRatio,
     endRatio,
     seekerPositionRatio,
-    DataManager.getRealtimeData());
+    DataManager.getRealtimeData(),
+    DataManager.getDataLength());
 
   drawOverviewCanvasRealtime(DataManager.getRealtimeData());
   oldTimestamp = timestamp;
@@ -169,6 +172,8 @@ const simulate = (timestamp) => {
 
 const pauseSimulation = () => {
   pausedIndex = timeIndex;
+  pausedDataLength = DataManager.getDataLength();
+  pausedFlag = true;
   cancelAnimationFrame(requestId);
 };
 
@@ -181,7 +186,8 @@ const stopSimulation = () => {
   DataVisualizer.updatedataVisualizers(startRatio,
     endRatio,
     seekerPositionRatio,
-    DataManager.getRealtimeData());
+    DataManager.getRealtimeData(),
+    DataManager.getDataLength());
 
   pausedIndex = 0;
 };
@@ -242,11 +248,19 @@ window.addEventListener('resize', () => {
   setOverviewDimensions();
   overviewCanvas.width = overviewCanvas.parentNode.getBoundingClientRect().width * 4;
   drawOverviewCanvasRealtime(DataManager.getRealtimeData());
+  let dataLength;
+
+  if (pausedFlag === true) {
+    dataLength = pausedDataLength;
+  } else {
+    dataLength = DataManager.getDataLength();
+  }
 
   DataVisualizer.updatedataVisualizers(startRatio,
     endRatio,
     seekerPositionRatio,
-    DataManager.getRealtimeData());
+    DataManager.getRealtimeData(),
+    dataLength);
 
   Model.resizeCanvasToDisplaySize();
   Model.renderOnce();
@@ -283,10 +297,19 @@ const makeEdgePositioner = ((elementToMove, originalY, originalZoom) => (event) 
   endRatio = Math.min(1, 1 - (overviewRect.right - sliderRect.right)
   / (overviewRect.right - overviewRect.left));
 
+  let dataLength;
+
+  if (pausedFlag === true) {
+    dataLength = pausedDataLength;
+  } else {
+    dataLength = DataManager.getDataLength();
+  }
+
   DataVisualizer.updatedataVisualizers(startRatio,
     endRatio,
     seekerPositionRatio,
-    DataManager.getRealtimeData());
+    DataManager.getRealtimeData(),
+    dataLength);
 });
 
 

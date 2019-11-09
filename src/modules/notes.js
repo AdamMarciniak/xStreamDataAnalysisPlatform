@@ -60,13 +60,13 @@ const createCanvasesFromConfig = (config) => {
 const templateContent = document.querySelector('#sensorInfo').content;
 
 export const createDataVisualizer = (title, renderScaling = 1) => {
-  const template = document.importNode(templateContent, true);
-  const canvas = clone.querySelector('canvas');
+  const templateClone = document.importNode(templateContent, true);
+  const canvas = templateClone.querySelector('canvas');
   const rect = canvas.parentNode.getBoundingClientRect();
-  dataVisualizer.querySelector('h3').innerText = title;
   canvas.width = rect.width * renderScaling;
   canvas.height = rect.height * renderScaling;
-  return clone;
+  getTitleElement(templateClone).innerText = title;
+  return templateClone;
 }
 
 export const getValueReadoutElement = (dataVisualizer) => dataVisualizer.querySelector('h4');
