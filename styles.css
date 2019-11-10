@@ -17,7 +17,7 @@ html, body {
 
 #modelCanvas {
     width: 45vw;
-    height: 600px;
+    height: 450px;
 }
 
 #stack {
@@ -83,10 +83,26 @@ button:focus {
     width: 150px;
     justify-content:flex-right;
     font-size: 18px;
+    font-family: Roboto,monospace;
     color: #000000;
     pointer-events: none;
     box-shadow: none;
 }
+
+#map {
+    position: absolute;
+    top: 500px;
+    bottom: 50px;
+    width: 45vw;
+    margin-left: 20px;
+    box-shadow: 1px 2px 3px 0px #00000054
+}
+
+.mapboxgl-canvas {
+    left: 0;
+    z-index: 0;
+}
+
 
 #graphButtons {
     width: 100%;

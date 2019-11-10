@@ -144,7 +144,7 @@ const convertSecToTime = (secs) => {
   const remainder = ms % 60000;
   const sec = Math.floor(remainder / 1000);
   const millis = remainder % 1000;
-  return `${(min < 10 ? '0' : '')}${min} : ${(sec < 10 ? '0' : '')}${sec} : ${(millis < 10 ? '00' : millis < 100 ? '0' : '')}${millis}`;
+  return `${(min < 10 ? '0' : '')}${min}:${(sec < 10 ? '0' : '')}${sec}:${(millis < 10 ? '00' : millis < 100 ? '0' : '')}${millis}`;
 };
 
 let i = 0;
