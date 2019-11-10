@@ -16,15 +16,17 @@ export const setupRealtimeData = () => {
   });
 };
 
-export const getDataLength = () => realtimeData[Object.keys(realtimeData)[0]].y.length;
+export const getDataLength = () => realtimeData[Object.keys(realtimeData)[0]].x.length;
 
+export const getLiveTime = () => realtimeData[Object.keys(realtimeData)[0]].x[getDataLength() - 1];
 
 export const addToRealtimeData = (sensor, xVal, yVal) => {
   realtimeData[sensor].x.push(xVal);
   realtimeData[sensor].y.push(yVal);
 };
 
-export const getRealtimeData = () => (realtimeData);
+export const getRealtimeData = () => realtimeData;
+
 
 export const getLatestYValue = (key) => realtimeData[key].y[realtimeData[key].y.length - 1];
 

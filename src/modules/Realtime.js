@@ -8,8 +8,7 @@ let realtimeFlag = 0;
 export const getRealtimeFlag = () => realtimeFlag;
 
 const addChangedData = (index, timeIndex, data) => {
-  DataManager.addToRealtimeData(index, timeIndex, 3.5 * Math.sin(data * 10)
-    + 0.3 * Math.random() * Math.sin(data * 100));
+  DataManager.addToRealtimeData(index, timeIndex, 3.9 * Math.sin(data * 100));
 };
 
 let timeIndex = 0;
@@ -26,9 +25,12 @@ const establishWebsockets = () => {
   ws.onmessage = function onMessage(event) {
     realtimeFlag = 1;
     const message = event.data;
-    const xAngle = parseFloat(message.substring(1));
-    addChangedData(message[0], timeIndex, xAngle);
-    timeIndex += 0.016;
+    const dataValues = message.split(',');
+    timeIndex += 0.064;
+    dataValues.forEach((value) => {
+      const cleanValue = parseFloat(value.substring(1));
+      addChangedData(value[0], timeIndex, cleanValue);
+    });
   };
 };
 

@@ -34,6 +34,8 @@ const overviewCanvasCtx = overviewCanvas.getContext('2d');
 const playButton = document.getElementById('playButton');
 const pauseButton = document.getElementById('pauseButton');
 const stopButton = document.getElementById('stopButton');
+const timeDisplay = document.getElementById('timeButton');
+timeDisplay.innerText = '00:00:00';
 const speedButton = document.getElementById('speedButton');
 const overviewSliderStart = document.getElementById('overviewSliderStart');
 const overviewSeeker = document.getElementById('overviewSeeker');
@@ -136,9 +138,19 @@ const drawOverviewCanvasRealtime = (data) => {
 
 DataVisualizer.updatedataVisualizers(0.1, 1, 0, DataManager.getRealtimeData(), DataManager.getDataLength());
 
+const convertSecToTime = (secs) => {
+  const ms = (secs * 1000).toFixed(0);
+  const min = Math.floor(ms / 60000);
+  const remainder = ms % 60000;
+  const sec = Math.floor(remainder / 1000);
+  const millis = remainder % 1000;
+  return `${(min < 10 ? '0' : '')}${min} : ${(sec < 10 ? '0' : '')}${sec} : ${(millis < 10 ? '00' : millis < 100 ? '0' : '')}${millis}`;
+};
+
 let i = 0;
 const simulate = (timestamp) => {
   i += 1;
+  timeDisplay.innerText = convertSecToTime(DataManager.getLiveTime());
   pausedFlag = false;
   if (oldTimestamp === 0) oldTimestamp = timestamp;
   const delta = (timestamp - oldTimestamp) * seekerSpeed;

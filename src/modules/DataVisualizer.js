@@ -49,6 +49,7 @@ export const getCanvasRect = () => {
 const createDataVisualizer = (title) => {
   const visualizer = document.importNode(templateContent, true).children[0];
   getTitleElement(visualizer).innerText = title.toUpperCase();
+  getValueReadoutElement(visualizer).innerText = '0.00 m/s';
   return visualizer;
 };
 
