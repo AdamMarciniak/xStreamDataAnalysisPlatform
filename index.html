@@ -1,6 +1,7 @@
 <html>
 
   <head>
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:700&display=swap" rel="stylesheet">
   <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet'>
@@ -10,7 +11,33 @@
 
   <body>
     <div class="viewport">
+    <div class="modelLoadingWrapper">
+    <div class="hill">
+	<div  class="car"> 
+		<div class="frame">
+		<img src="frame.svg">
+		</div>
+
+		<div class="wheels">
+			<div class="wheel" id="wheelFront">
+			<img src="wheel.svg">
+			</div>
+			
+			<div class="wheel" id="wheelRear">
+			<img src="wheel.svg">
+			</div>
+		<div class="ground"> </div>
+
+		</div>
+
+	</div>
+	
+	<div class="loading">
+	Loading
+	</div>
+</div>
       <canvas id="modelCanvas"></canvas>
+    </div>
       <div id='map'></div>
     </div>
     <div id="stack">
@@ -76,17 +103,7 @@
   
  
   <script src="./dist/bundle.js"></script>
-  <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoicG9saXNoZHVkZTIwIiwiYSI6ImNrMnRodjhidTBsM2QzbnFjdWZ4MzE3aGoifQ.7SUuuzTY1ED9vtGhi_KbyQ';
-      var map = new mapboxgl.Map({
-        container: 'map', // container id
-        style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
-        center: [-122.255090, 45.632770], // starting position [lng, lat]
-        pitch: 60, // pitch in degrees
-        bearing: 0, // bearing in degrees
-        zoom: 14.5 // starting zoom
-      });
-  </script>
+  
 
   
 
