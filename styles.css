@@ -1,4 +1,14 @@
 
+/* bebas-neue-regular - latin */
+@font-face {
+  font-family: 'Bebas Neue';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Bebas Neue Regular'), local('BebasNeue-Regular'),
+       url('../fonts/bebas-neue-v1-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/bebas-neue-v1-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
 html, body {
 	padding: 0;
     margin: 0;
@@ -15,9 +25,21 @@ html, body {
     justify-content: flex-end;
 }
 
+.modelLoadingWrapper {
+    position: absolute;
+    display: flex;
+    left: 40px;
+    width: 45vw;
+    height: 450px;
+    background: #e5e5e5;
+    align-items: center;
+    justify-content: center;
+    z-index: 21;
+}
+
 #modelCanvas {
     width: 45vw;
-    height: 600px;
+    height: 450px;
 }
 
 #stack {
@@ -83,10 +105,26 @@ button:focus {
     width: 150px;
     justify-content:flex-right;
     font-size: 18px;
+    font-family: Roboto,monospace;
     color: #000000;
     pointer-events: none;
     box-shadow: none;
 }
+
+#map {
+    position: absolute;
+    top: 500px;
+    bottom: 50px;
+    width: 45vw;
+    margin-left: 20px;
+    box-shadow: 1px 2px 3px 0px #00000054
+}
+
+.mapboxgl-canvas {
+    left: 0;
+    z-index: 0;
+}
+
 
 #graphButtons {
     width: 100%;
@@ -114,6 +152,16 @@ button:focus {
     margin-top: 20px;
     height: 150px;
     right: -17px;
+}
+
+.marker {
+  background-image: url('map-marker.png');
+  background-size: cover;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
 }
 
 #graphTimeBar:before {
@@ -300,6 +348,79 @@ h3 {
     z-index: 0;
     top: 0;
 }
+
+
+.hill {
+	display: flex;
+	align-content:center;
+	justify-content:center;
+	
+}
+
+.loading {
+	position:absolute;
+	font-size: 60px;
+	color: #818181;
+    bottom: 90px;
+	font-family: 'Bebas Neue', cursive;
+}
+
+.ground {
+	content: "";
+    width: 150;
+    height: 2px;
+    background: #8181811f;
+    top: 49;
+    position: absolute;
+    left: -12;
+}
+
+.wheel {
+	animation: spin 0.5s infinite linear ;
+}
+    
+.wheels {
+	-webkit-animation: action 0.25s infinite alternate;
+ }
+    
+@-webkit-keyframes action {
+	0% { transform: translateY(-40px); }
+	100% { transform: translateY(-30px); }
+}
+@keyframes action {
+	0% { transform: translateY(-40px); }
+	100% { transform: translateY(-30px); }
+}  
+    
+@-moz-keyframes spin { 100% { -moz-transform: rotate(1080deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(1080deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(1080deg); transform:rotate(1080deg); } }
+
+
+.car {
+	animation: wobble 1s infinite linear;
+}
+
+@keyframes wobble {
+0% { transform: rotate(-3deg); }
+50% { transform: rotate(3deg); }
+100% { transform: rotate(-3deg); }
+}  
+
+.car {
+    position: relative;
+}
+
+.wheel {
+    position: absolute;
+    top: 50%;
+}
+
+div#wheelFront {
+    left: -20%;
+}
+
+div#wheelRear {left: 73.5%;}
 
 	
 

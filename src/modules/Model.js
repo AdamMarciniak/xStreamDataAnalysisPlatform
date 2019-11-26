@@ -42,6 +42,8 @@ partNames.forEach((name) => {
   parts[name] = new THREE.Mesh();
 });
 
+document.getElementById('modelCanvas').style.visibility = 'hidden';
+
 const loader = new STLLoader();
 
 export const renderOnce = () => {
@@ -148,6 +150,10 @@ const renderSetup = () => {
   controls.update();
   controls.addEventListener('change', renderOnce);
   renderer.render(scene, camera);
+  document.querySelector('.modelLoadingWrapper').style.visibility = 'hidden';
+  document.getElementById('modelCanvas').style.visibility = 'visible';
+
+
 };
 
 const loadTopArm = () => new Promise((resolve) => loader.load('./../../stl/topArm.stl', resolve));

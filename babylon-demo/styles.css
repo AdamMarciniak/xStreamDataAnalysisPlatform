@@ -1,0 +1,19 @@
+body {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    flex-direction: vertical;
+    justify-content: center;
+    flex-direction: column;
+}
+
+canvas {
+    background: #000;
+    width: 1200;
+    height: 600;
+}
+
+.coordinates {
+    font-size: 20px;
+    color: #000;
+}

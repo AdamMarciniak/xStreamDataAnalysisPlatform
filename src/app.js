@@ -5,6 +5,7 @@ import * as Simulation from './modules/Simulation';
 import * as DataVisualizer from './modules/DataVisualizer';
 import { scaleValues } from './modules/Utils';
 import startRealtimeGathering from './modules/Realtime';
+import * as MapController from './modules/MapController';
 
 const sensorConfig = require('../config/sensorConfig.json');
 
@@ -29,6 +30,8 @@ let timePassedSincePlay = 0;
 let requestId;
 let oldTimestamp = 0;
 
+MapController.initializeMap();
+
 const overviewCanvas = document.getElementById('graphOverview');
 const overviewCanvasCtx = overviewCanvas.getContext('2d');
 const playButton = document.getElementById('playButton');
@@ -39,6 +42,8 @@ timeDisplay.innerText = '00:00:00';
 const speedButton = document.getElementById('speedButton');
 const overviewSliderStart = document.getElementById('overviewSliderStart');
 const overviewSeeker = document.getElementById('overviewSeeker');
+
+
 
 
 const getElementWidth = (element) => {
@@ -144,7 +149,7 @@ const convertSecToTime = (secs) => {
   const remainder = ms % 60000;
   const sec = Math.floor(remainder / 1000);
   const millis = remainder % 1000;
-  return `${(min < 10 ? '0' : '')}${min} : ${(sec < 10 ? '0' : '')}${sec} : ${(millis < 10 ? '00' : millis < 100 ? '0' : '')}${millis}`;
+  return `${(min < 10 ? '0' : '')}${min}:${(sec < 10 ? '0' : '')}${sec}:${(millis < 10 ? '00' : millis < 100 ? '0' : '')}${millis}`;
 };
 
 let i = 0;
@@ -179,6 +184,13 @@ const simulate = (timestamp) => {
 
   drawOverviewCanvasRealtime(DataManager.getRealtimeData());
   oldTimestamp = timestamp;
+  const longitude = -122.255090 + i * 0.0001;
+  const latitude = 45.632770 + frontRightSuspensionAngle * 0.001;
+
+  if (i % 20 === 0) {
+    MapController.addLineCoordinates(longitude, latitude);
+  }
+
   requestId = requestAnimationFrame(simulate);
 };
 

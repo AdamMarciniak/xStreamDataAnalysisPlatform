@@ -6,7 +6,8 @@
   "main": "app.js",
   "scripts": {
     "start": "npm run webpack --display-error-details",
-    "webpack": "webpack -d --display-error-details",
+    "dev": "webpack --config webpack.dev.js --display-error-details && http-server",
+    "prod": "webpack --config webpack.prod.js --display-error-details && bash deploy.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,10 +22,16 @@
   },
   "homepage": "https://github.com/polishdude20/xStreamDataAnalysisPlatform#readme",
   "devDependencies": {
+    "html-webpack-plugin": "^3.2.0",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9"
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-dev-server": "^3.9.0",
+    "webpack-hot-middleware": "^2.25.0",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "mapbox-gl": "^1.5.0",
     "three": "^0.109.0",
     "ws": "^7.2.0"
   }
