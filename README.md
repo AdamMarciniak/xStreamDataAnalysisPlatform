@@ -3,7 +3,6 @@
 
 ![Interface Image](interface.png)
 
-
 Data Analytics Platform for BCIT Racing Car. (In Development)
 
 Check out a live demo here! 
