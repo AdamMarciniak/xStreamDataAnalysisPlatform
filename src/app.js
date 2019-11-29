@@ -6,6 +6,9 @@ import * as DataVisualizer from './modules/DataVisualizer';
 import { scaleValues } from './modules/Utils';
 import startRealtimeGathering from './modules/Realtime';
 import * as MapController from './modules/MapController';
+import LogRocket from 'logrocket';
+
+LogRocket.init('p3pydi/xstream');
 
 const sensorConfig = require('../config/sensorConfig.json');
 
