@@ -22,20 +22,21 @@ button {
   align-items: center;
 }
 
-.navBar > button {
+.navBar > a {
   margin-right: 20px;
   background-color: Transparent;
   border: none;
   outline: none;
   color: #dedede;
   font-size: 20px;
+  text-decoration: none;
 }
 
-.navBar > button:hover {
+.navBar > a:hover {
   color: #ffabab;
 }
 
-.navBar > button:active {
+.navBar > a:active {
   color: rgb(146, 72, 72);
 }
 
@@ -54,7 +55,7 @@ button {
   align-items: center;
   justify-content: center;
   margin-top: 40px;
-  width: 640px;
+  width: 800px;
   height: 120px;
   transform: skew(-35deg);
   background: linear-gradient(83.12deg, #e74c4c 33.96%, #f38c8c 79.31%);
@@ -86,9 +87,9 @@ button {
   text-shadow: 0px 0px 20px rgba(255, 168, 87, 0.72);
 }
 
-.mainButtons > .navOption > button {
+.mainButtons > .navOption > a {
+  height: auto;
   width: 300px;
-  height: 140px;
   margin: 0;
   border-radius: 10px;
   font-size: 40px;
@@ -97,6 +98,9 @@ button {
   color: #c2c2c2;
   line-height: 100%;
   margin-top: 20px;
+  text-align: center;
+  padding: 25px 0;
+  text-decoration: none;
 }
 
 #realtimeButton {
@@ -122,7 +126,7 @@ button {
   box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.38);
 }
 
-button:focus {
+a:focus {
   outline: 0;
 }
 
@@ -159,7 +163,7 @@ h3 {
   margin-top: 40px;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 1100px) {
   body {
     overflow: auto;
   }
@@ -183,7 +187,7 @@ h3 {
   }
 
   h1 {
-    font-size: 4em;
+    font-size: 2em;
     transform: skew(0);
   }
 
@@ -195,11 +199,13 @@ h3 {
   h3 {
     margin-top: 0;
     font-size: 1em;
+    visibility: hidden;
+    height: 0;
   }
 
   .navOption {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 0;
   }
 
   .navDescription {
@@ -212,14 +218,19 @@ h3 {
 
   .logoShape {
     width: 100%;
-    margin-top: 10px;
-    height: 5em;
+    margin-top: 0;
+    height: 3em;
     transform: skew(0);
+    border-radius: 0;
   }
 
-  .mainButtons > .navOption > button {
+  .mainButtons > .navOption > a {
     width: 100%;
-    height: 100px;
+    height: auto;
     margin: 0;
+    text-align: center;
+    padding: 10px 0;
+    text-decoration: none;
+    font-size: 30px;
   }
 }
