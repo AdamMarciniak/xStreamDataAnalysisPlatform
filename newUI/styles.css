@@ -85,7 +85,7 @@ button:active {
 }
 
 .timeline {
-  background: #464646 !important;
+  background: #ff7979 !important;
   grid-area: timeline;
 }
 
@@ -115,22 +115,24 @@ button:active {
 
   .main-container {
     display: grid;
-    height: 100%;
+    height: 720px;
+    grid-auto-flow: false;
 
     grid-template-columns: 15px 1fr 10px 1fr 15px;
-    grid-template-rows: 40px 150px 10px 400px 5px 1fr 10px;
+    grid-template-rows: 40px 10px 50% 5px 1fr 10px 1fr;
     grid-template-areas:
-      ". . . . ."
-      ". model . map ."
+      ". fuel . time ."
       ". . . . ."
       "graphs graphs graphs graphs graphs"
       ". . . . ."
       ". timeline timeline timeline ."
-      ". . . . .";
+      ". . . . ."
+      ". model map playButtons .";
   }
 
   .graphing-viewport {
     grid-area: graphs;
+
     display: grid;
     grid-template-columns: 20px 1fr 20px;
     grid-template-rows: 15px 1fr 30px;
