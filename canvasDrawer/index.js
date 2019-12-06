@@ -73,16 +73,18 @@ const moveListener = event => {
   const xPos = event.clientX;
   const yPos = event.clientY;
 
-  if (
-    mouseDown &&
-    xPos > canvasLeft &&
-    xPos < canvasLeft + canvasWidth &&
-    yPos > canvasTop &&
-    yPos < canvasTop + canvasHeight - 3.5
-  ) {
+  if (mouseDown && xPos > canvasLeft && xPos < canvasLeft + canvasWidth) {
     drawing = true;
     const canvasXPoint = xPos - canvasLeft;
-    const canvasYPoint = yPos - canvasTop;
+    let canvasYPoint = yPos - canvasTop;
+
+    if (canvasYPoint > canvas.height - 3.5) {
+      canvasYPoint = canvas.height;
+    }
+
+    if (canvasYPoint < 0) {
+      canvasYPoint = 0;
+    }
 
     data[canvasXPoint] = canvasYPoint;
 
