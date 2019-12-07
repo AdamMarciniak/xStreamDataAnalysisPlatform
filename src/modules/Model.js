@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { OrbitControls } from './OrbitControls';
 import { STLLoader } from './STLLoader';
 import FourBar from './vectorFourBar';
+import { scaleValues } from './Utils';
+
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth
@@ -187,8 +189,8 @@ export const loadAllGeometry = () => {
 };
 
 export const animate = (left, right) => {
-  armTopKnuckleGroupLeft.rotation.x = left * 0.1;
-  armTopKnuckleGroupRight.rotation.x = right * 0.1;
+  armTopKnuckleGroupLeft.rotation.x = scaleValues(left, 0, 100, Math.PI/4, -Math.PI/7);
+  armTopKnuckleGroupRight.rotation.x = scaleValues(right, 0, 100, Math.PI/4, -Math.PI/7);
 
   const angleLeft = ((armTopKnuckleGroupLeft.rotation.x + Math.PI / 2.0)
    + 45.0 * (Math.PI / 180.0));

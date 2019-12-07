@@ -6,12 +6,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoicG9saXNoZHVkZTIwIiwiYSI6ImNrMnRodjhidTBsM2Qzb
 const map = new mapboxgl.Map({
   container: 'map', // container id
   style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
-  center: [-122.255090, 45.632770], // starting position [lng, lat]
+  center: [-122.2547275, 45.632601], // starting position [lng, lat]
   pitch: 60, // pitch in degrees
   bearing: 0, // bearing in degrees
-  zoom: 9, // starting zoom
+  zoom: 16, // starting zoom
 });
-
 
 const geojson = {
   type: 'FeatureCollection',
@@ -19,7 +18,7 @@ const geojson = {
     type: 'Feature',
     geometry: {
       type: 'Point',
-      coordinates: [-122.255090, 45.632770],
+      coordinates: [-122.2547275, 45.632601],
     },
     properties: {
       title: 'Mapbox',
@@ -30,7 +29,7 @@ const geojson = {
     type: 'Feature',
     geometry: {
       type: 'Point',
-      coordinates: [-122.255090, 45.632500],
+      coordinates: [-122.2547275, 45.632601],
     },
     properties: {
       title: 'Mapbox',
@@ -76,8 +75,8 @@ export const addLineCoordinates = ((longitude, latitude) => {
   });
 
   map.getSource('line-animation').setData(geojson);
-  map.flyTo({ center: [longitude, 45.632770] });
 });
+
 
 export const addMarkerToMap = ((longitude, latitude) => {
   geojson.features.push(getNewMarker(longitude, latitude));
@@ -88,7 +87,6 @@ export const addMarkerToMap = ((longitude, latitude) => {
     new mapboxgl.Marker(el)
       .setLngLat(marker.geometry.coordinates)
       .addTo(map);
-    map.center = [longitude, latitude];
   });
 });
 

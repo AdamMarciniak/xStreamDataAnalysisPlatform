@@ -1,51 +1,51 @@
 {
   "0" : {
-    "title": "Left Suspension Angle",
+    "title": "Left Front Suspension Angle",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -4,
-    "max": 4
+    "min": 0,
+    "max": 100
   },
   "1": {
-    "title": "Left Suspension Angle2",
+    "title": "Right Front Suspension Angle",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -4,
-    "max": 4
+    "min": 0,
+    "max": 100
   },
   "2": {
-    "title": "Left Suspension Angle3",
+    "title": "X Acceleration",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -4,
-    "max": 4
+    "min": 0,
+    "max": 100
   },
   "3": {
-    "title": "Left Suspension Angle4",
+    "title": "Y Acceleration",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -4,
-    "max": 4
+    "min": 0,
+    "max": 100
   },
   "4": {
-    "title": "Left Suspension Angle5",
+    "title": "RPM",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -4,
-    "max": 4
+    "min": 0,
+    "max": 100
   },
   "5": {
-    "title": "Left Suspension Angle6",
+    "title": "Rear Right Shock Position",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -4,
-    "max": 4
+    "min": 0,
+    "max": 100
   },
   "6": {
-    "title": "Left Suspension Angle7",
+    "title": "Rear Left Shock Position",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -4,
-    "max": 4
+    "min": 0,
+    "max": 100
   },
   "7": {
-    "title": "Left Suspension Angle8",
+    "title": "Fuel Level",
     "description": "Angular data from accelerometer mounted on frame body in X direction.",
-    "min": -4,
-    "max": 4
+    "min": 0,
+    "max": 100
   }
 }
 

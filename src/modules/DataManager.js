@@ -1,5 +1,4 @@
 
-const SAMPLE_PERIOD_SECONDS = 0.01;
 let allPropertyPoints = {};
 const sensorConfig = require('../../config/sensorConfig.json');
 
@@ -30,25 +29,6 @@ export const getRealtimeData = () => realtimeData;
 
 export const getLatestYValue = (key) => realtimeData[key].y[realtimeData[key].y.length - 1];
 
-
-const createFakeRawData = (nonTimeProperties, numDataPoints) => {
-  const timeArray = [];
-  const allRawData = {};
-  const rawData = {};
-  let k = 1;
-  const createFakeData = nonTimeProperties.forEach((property) => {
-    const yValues = [];
-    for (let i = 0; i < numDataPoints; i += 1) {
-      timeArray[i] = ((SAMPLE_PERIOD_SECONDS * i));
-      k = timeArray[i];
-      yValues[i] = (-0.5 * Math.sin(k * 20)) / Math.exp(k * 4) + 0.005 * Math.sin(i);
-    }
-    rawData[property] = yValues;
-  });
-  allRawData.yValues = rawData;
-  allRawData.timeValues = timeArray;
-  return allRawData;
-};
 
 const convertDataToPointPairs = (allRawData) => {
   Object.keys(allRawData.yValues).forEach((key) => {

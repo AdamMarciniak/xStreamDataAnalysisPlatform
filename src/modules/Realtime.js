@@ -8,7 +8,7 @@ let realtimeFlag = 0;
 export const getRealtimeFlag = () => realtimeFlag;
 
 const addChangedData = (sensorIndex, timeIndex, data) => {
-  DataManager.addToRealtimeData(sensorIndex, timeIndex, 3.9 * Math.sin(data * 100));
+  DataManager.addToRealtimeData(sensorIndex, timeIndex, data);
 };
 
 let timeIndex = 0;
@@ -26,12 +26,10 @@ const establishWebsockets = () => {
     realtimeFlag = 1;
     const message = event.data;
     const dataValues = message.split(',');
-    timeIndex += 0.064;
+    timeIndex += 1;
     dataValues.forEach((value) => {
       const cleanValue = parseFloat(value.substring(1));
       addChangedData(value[0], timeIndex, cleanValue);
-      // Work to do. Add fake coordinates data to be piped into datamanager . markers are ready to receive,.
-      -122.255090, 45.632500
     });
   };
 };

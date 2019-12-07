@@ -100,12 +100,14 @@ export const updatedataVisualizers = (arrayStartRatio, arrayEndRatio, seekerRati
 
     let interval = 1;
     if ((end - start) > 8000) {
-      interval = 20;
+      interval = 30;
     } else if ((end - start) > 4000) {
-      interval = 10;
+      interval = 20;
     } else if ((end - start) > 2000) {
-      interval = 4;
+      interval = 8;
     }
+
+    // const interval = Math.max(1, Math.round(end - start / 1000));
 
     for (let i = start; i < end; i += interval) {
       ctx.lineTo(scaleValues(data[key].x[i],
