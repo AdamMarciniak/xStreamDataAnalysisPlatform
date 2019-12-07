@@ -26,7 +26,7 @@ const establishWebsockets = () => {
     realtimeFlag = 1;
     const message = event.data;
     const dataValues = message.split(',');
-    timeIndex += 1;
+    timeIndex += 0.032;
     dataValues.forEach((value) => {
       const cleanValue = parseFloat(value.substring(1));
       addChangedData(value[0], timeIndex, cleanValue);

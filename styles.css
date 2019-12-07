@@ -9,6 +9,13 @@
        url('../fonts/bebas-neue-v1-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
+.mapMarker {
+    background-image: url('mapMarker.png');
+    background-size: cover;
+    width: 25px;
+    height: 25px;
+}
+
 html, body {
 	padding: 0;
     margin: 0;

@@ -15,27 +15,17 @@ const map = new mapboxgl.Map({
 const geojson = {
   type: 'FeatureCollection',
   features: [{
-    type: 'Feature',
+    type: 'Marker',
     geometry: {
       type: 'Point',
       coordinates: [-122.2547275, 45.632601],
     },
     properties: {
-      title: 'Mapbox',
-      description: 'Washington, D.C.',
+      title: 'Marker',
+      description: 'Car Location',
     },
   },
-  {
-    type: 'Feature',
-    geometry: {
-      type: 'Point',
-      coordinates: [-122.2547275, 45.632601],
-    },
-    properties: {
-      title: 'Mapbox',
-      description: 'San Francisco, California',
-    },
-  }],
+  ],
 };
 
 const getNewMarker = ((longitude, latitude) => {
@@ -77,16 +67,19 @@ export const addLineCoordinates = ((longitude, latitude) => {
   map.getSource('line-animation').setData(geojson);
 });
 
+const el = document.createElement('div');
+el.className = 'mapMarker';
+const markerIcon = new mapboxgl.Marker(el)
+markerIcon.setLngLat([-122.2547275, 45.632601])
+  .addTo(map);
 
-export const addMarkerToMap = ((longitude, latitude) => {
-  geojson.features.push(getNewMarker(longitude, latitude));
-  geojson.features.forEach((marker) => {
-    const el = document.createElement('div');
-    el.className = 'marker';
+export const updateMapMarker = ((longitude, latitude) => {
+  geojson.features.forEach((feature) => {
+    if (feature.geometry.type === 'Point') {
+      feature.geometry.coordinates = [longitude, latitude];
+      markerIcon.setLngLat(feature.geometry.coordinates);
 
-    new mapboxgl.Marker(el)
-      .setLngLat(marker.geometry.coordinates)
-      .addTo(map);
+    }
   });
 });
 

@@ -48,9 +48,6 @@ const speedButton = document.getElementById('speedButton');
 const overviewSliderStart = document.getElementById('overviewSliderStart');
 const overviewSeeker = document.getElementById('overviewSeeker');
 
-
-
-
 const getElementWidth = (element) => {
   const elementRect = element.getBoundingClientRect();
   return elementRect.right - elementRect.left;
@@ -189,12 +186,13 @@ const simulate = (timestamp) => {
   //drawOverviewCanvasRealtime(DataManager.getRealtimeData());
   oldTimestamp = timestamp;
 
-  if (i % 10 === 0) {
+  if (i % 100 === 0) {
     mapCount += 1;
     if (mapCount === mapData.length - 1) {
       mapCount = 0;
     }
     MapController.addLineCoordinates(mapData[mapCount].x, mapData[mapCount].y);
+    MapController.updateMapMarker(mapData[mapCount].x, mapData[mapCount].y);
   }
 
   requestId = requestAnimationFrame(simulate);
@@ -376,11 +374,8 @@ const getNearestElement = ([x, y], elements) => {
   return nearestElement;
 };
 
-overviewCanvas.addEventListener('mousedown', (event) => {
-  const nearestEdge = getNearestElement(
-    [event.clientX, event.clientY],
-    [overviewSliderStart],
-  );
+overviewCanvas.addEventListener('pointerdown', (event) => {
+  document.querySelector('body').setAttribute('style', 'touch-action: none');
   const sliderWindowRect = overviewSliderStart.getBoundingClientRect();
   const overviewRect = overviewCanvas.getBoundingClientRect();
   const sliderWindowWidth = sliderWindowRect.right - sliderWindowRect.left;

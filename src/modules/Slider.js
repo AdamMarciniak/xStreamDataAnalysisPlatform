@@ -9,9 +9,11 @@ export const mouseYToZoomLevel = (newY, originalY, originalZoom) => {
 
 export const makeDragHandler = (onMouseMove) => {
   const removeWindowListeners = () => {
-    window.removeEventListener('mousemove', onMouseMove);
-    window.removeEventListener('mouseup', removeWindowListeners);
+    window.removeEventListener('pointermove', onMouseMove);
+    window.removeEventListener('pointerup', removeWindowListeners);
+    document.querySelector('body').setAttribute('style', 'touch-action: auto');
+
   };
-  window.addEventListener('mousemove', onMouseMove);
-  window.addEventListener('mouseup', removeWindowListeners);
+  window.addEventListener('pointermove', onMouseMove);
+  window.addEventListener('pointerup', removeWindowListeners);
 };
