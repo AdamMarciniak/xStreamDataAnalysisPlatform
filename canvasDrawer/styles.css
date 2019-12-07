@@ -2,12 +2,13 @@ canvas {
   height: 700px;
   width: 1000px;
   border: solid black 2px;
+  touch-action: none;
 }
 
 div {
   position: absolute;
   top: 0;
-  right: 100px;
+  right: 50px;
   overflow: auto;
   width: 300px;
   height: 700px;

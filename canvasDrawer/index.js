@@ -1,5 +1,5 @@
 const canvas = document.querySelector("canvas");
-const resultsButton = document.querySelector("button");
+const resultsButton = document.querySelector(".outputButton");
 const outputBox = document.querySelector("div");
 
 console.log(canvas);
@@ -14,28 +14,43 @@ const scaleData = (input, minIn, maxIn, minOut, maxOut) => {
   return ratio * (maxOut - minOut) + minOut;
 };
 
-const convertAllData = data => {
+const convertAllData = (data) => {
   const convertedData = [];
-  Object.keys(data).forEach(xVal => {
+  Object.keys(data).forEach((xVal) => {
     const scaledX = scaleData(xVal, 0, canvas.width, minXRange, maxXRange);
     const scaledY = scaleData(
       data[xVal],
       canvas.height,
       0,
       minYRange,
-      maxYRange
+      maxYRange,
     );
     convertedData.push([scaledX, scaledY]);
   });
 
   let textOut = "";
+  let copyText = "const value = [";
 
   convertedData.forEach(point => {
     textOut += "\n" + [point[0].toFixed(2), point[1].toFixed(2)];
   });
 
-  outputBox.innerText = textOut;
+  convertedData.forEach(point => {
+    copyText += `{x: ${point[0].toFixed(2)} , y: ${point[1].toFixed(2)}},`;
+  });
+  copyText += '];';
+
+  outputBox.innerText = copyText;
+
+  const el = document.createElement('textarea');
+  el.value = copyText;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+
 };
+
 
 canvas.style.width = canvas.width;
 canvas.style.height = canvas.height;
@@ -54,8 +69,8 @@ document.addEventListener("resize", () => {
 let mouseDown = 0;
 const downListener = () => {
   mouseDown = 1;
-  document.addEventListener("mousemove", moveListener);
-  document.addEventListener("mouseup", upListener);
+  document.addEventListener("pointermove", moveListener);
+  document.addEventListener("pointerup", upListener);
 };
 
 let point1x = 0;
@@ -70,8 +85,9 @@ const moveListener = event => {
   const canvasTop = canvasRect.top;
   const canvasWidth = canvasRect.width;
   const canvasHeight = canvasRect.height;
-  const xPos = event.clientX;
-  const yPos = event.clientY;
+  const xPos = event.clientX.toFixed(0);
+  const yPos = event.clientY.toFixed(0);
+
 
   if (mouseDown && xPos > canvasLeft && xPos < canvasLeft + canvasWidth) {
     drawing = true;
@@ -87,6 +103,8 @@ const moveListener = event => {
     }
 
     data[canvasXPoint] = canvasYPoint;
+
+    console.log(data[canvasXPoint]);
 
     if (firstFlag === true) {
       point1y = canvasYPoint;
@@ -119,11 +137,11 @@ const moveListener = event => {
 const upListener = () => {
   mouseDown = 0;
   drawing = false;
-  document.removeEventListener("mousemove", moveListener);
-  document.removeEventListener("mouseup", upListener);
+  document.removeEventListener("pointermove", moveListener);
+  document.removeEventListener("pointerup", upListener);
 };
 
-document.addEventListener("mousedown", downListener);
+document.addEventListener("pointerdown", downListener);
 
 const render = () => {
   if (drawing) {
