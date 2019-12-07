@@ -48,6 +48,7 @@ const convertAllData = (data) => {
   el.select();
   document.execCommand('copy');
   document.body.removeChild(el);
+  alert('Copied to Clipboard');
 
 };
 
