@@ -1,4 +1,3 @@
-
 import * as DataManager from './DataManager';
 
 const sensorConfig = require('../../config/sensorConfig.json');
@@ -35,7 +34,6 @@ const establishWebsockets = () => {
 };
 
 const startRealtimeGathering = () => {
-  DataManager.setupRealtimeData();
   establishWebsockets();
 };
 
