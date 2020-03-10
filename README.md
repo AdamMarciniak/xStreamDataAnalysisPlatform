@@ -1,12 +1,14 @@
 # xStreamDataAnalysisPlatform
 
 
+# Live Demo. Press Play!
+# [http://adam.teaches.engineering](http://adam.teaches.engineering)
+
 ![Interface Image](interface.png)
 
 Data Analytics Platform for BCIT Racing Car. (In Development)
 
-Check out a live demo here! 
-[http://adam.teaches.engineering](http://adam.teaches.engineering)
+
 
 This tool works in tandem with an ESP32 module that gathers data from an offroad buggy.
 The ESP32 gathers data such as stress in frame members, suspension angles, RPM readings, car tilt, engine heat, and GPS position. The ESP32 then sends this data using websockets periodically (default every 100ms) to the Node server.
