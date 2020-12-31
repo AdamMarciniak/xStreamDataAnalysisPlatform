@@ -3,7 +3,6 @@
 
 # Live Demo. Press Play!
 # Currently offline as I move my server stuff over to Caddy.
-# [http://adam.teaches.engineering](http://adam.teaches.engineering)
 
 ![Interface Image](interface.png)
 
