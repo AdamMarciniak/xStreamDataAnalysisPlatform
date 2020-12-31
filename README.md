@@ -1,7 +1,6 @@
 # xStreamDataAnalysisPlatform
 
 
-# Live Demo. Press Play!
 # Currently offline as I move my server stuff over to Caddy.
 
 ![Interface Image](interface.png)
